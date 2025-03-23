@@ -14,6 +14,21 @@
 #include "hash.hpp"
 
 namespace cmd {
+    // unknown error must be the last
+    // also used as index
+    enum class error_type {
+        unknown_option,
+        too_many_arguments,
+        too_few_arguments,
+        flag_cannot_be_variable,
+        unknown_flag,
+        flag_does_not_accept_argument,
+        open_special_character,
+        invalid_argument,
+        unknown_error
+    };
+    constexpr std::size_t error_types_n = std::to_underlying(error_type::unknown_error) + 1;
+
     template <typename T>
     concept usage_id = std::is_integral_v<T> || std::is_enum_v<T>;
     struct usage_tag;
@@ -75,7 +90,7 @@ namespace cmd {
             format_string_type error_tmpl = config_default_type::error_tmpl;
             format_string_type ref_tmpl = config_default_type::ref_tmpl;
             special_chars<char_type> specials = config_default_type::specials;
-            std::array<format_string_type, 7> parse_error_msgs = config_default_type::parse_error_msgs;
+            std::array<format_string_type, error_types_n> error_msgs = config_default_type::error_msgs;
         };
     };
     template <typename T>
@@ -89,11 +104,11 @@ namespace cmd {
         parse_node_type type;
         union {
             std::basic_string_view<CharT> option_name{};
-            size_t var_index;
-            size_t usage_index;
+            std::size_t var_index;
+            std::size_t usage_index;
         };
-        size_t next_placeholder = 0; // 0: no next placeholder
-        size_t next = 0; // 0: invalid
+        std::size_t next_placeholder = 0; // 0: no next placeholder
+        std::size_t next = 0; // 0: invalid
     };
 
     template <size_t UsageSize, char_like CharT>
@@ -110,8 +125,8 @@ namespace cmd {
     concept hasher = requires(std::basic_string_view<CharT> str) {
         {Hash{}(str)} -> std::same_as<size_t>;
     };
-    template <typename Hash, size_t SetSize>
-    static constexpr size_t get_hash(auto str) noexcept {
+    template <typename Hash, std::size_t SetSize>
+    static constexpr std::size_t get_hash(auto str) noexcept {
         return Hash{}(str) % SetSize;
     }
 
@@ -119,7 +134,7 @@ namespace cmd {
     template <config_instance Config>
     struct parser_def {
         using tag = parser_def_tag;
-        size_t usage_size, tree_size, vars_size, flag_set_size, var_num;
+        std::size_t usage_size, tree_size, vars_size, flag_set_size, var_num;
         const Config& config;
     };
 
@@ -138,18 +153,13 @@ namespace cmd {
         std::array<flag_info<Def.usage_size, CharT>, Def.flag_set_size> flag_set;
     };
 
-    struct parse_error_tag;
-    struct parse_error_loc_tag;
-    struct parse_error_loc_c_tag;
-    enum class parse_error_type {
-        unknown_option,
-        too_many_arguments,
-        too_few_arguments,
-        flag_cannot_be_variable,
-        unknown_flag,
-        flag_does_not_accept_argument,
-        open_special_character
+    struct error_loc {
+        std::size_t arg_loc, in_arg_loc;
     };
+    struct parse_result_tag;
+    struct error_tag;
+    struct error_ref_tag;
+    struct error_ref_c_tag;
     template <tagged<parser_info_tag> auto& Info>
     class parser {
     public:
@@ -173,65 +183,11 @@ namespace cmd {
         static constexpr auto to_string = [](const auto& obj) noexcept {
             return string_type{obj};
         };
-        template <int Mode>
-        struct parse_error_loc_wrapper {
-            template <tagged<parse_error_loc_tag> Loc>
-            struct type {
-                using tag = parse_error_loc_c_tag;
-                using super_type = parser;
-                static constexpr int mode = Mode;
-                const Loc& loc;
-            };
-        };
-        template <typename Rng>
-        struct parse_error_loc {
-            using tag = parse_error_loc_tag;
-            using super_type = parser;
-            using range_value_type = std::remove_cvref_t<Rng>;
-            using range_type =
-                std::conditional_t<std::is_lvalue_reference_v<Rng>, const range_value_type&, range_value_type>;
-            range_type rng;
-            size_t arg_loc, in_arg_loc;
-            constexpr parse_error_loc(Rng&& rng) :
-                rng{std::forward<Rng>(rng)}, arg_loc{-1uz} {}
-            constexpr parse_error_loc(Rng&& rng, size_t arg_loc, size_t in_arg_loc) :
-                rng{std::forward<Rng>(rng)}, arg_loc{arg_loc}, in_arg_loc{in_arg_loc} {}
-            template <int Mode>
-            constexpr auto wrap() const noexcept {
-                return typename parse_error_loc_wrapper<Mode>::type{*this};
-            }
-        };
-        template <typename Rng>
-        struct parse_error {
-            using tag = parse_error_tag;
-            using super_type = parser;
-            parse_error_type type;
-            parse_error_loc<Rng> loc;
-            refs_type refs;
-
-            constexpr parse_error(parse_error_type type, Rng&& rng, refs_type refs = {}) noexcept :
-                type{type}, loc{std::forward<Rng>(rng)}, refs{std::move(refs)} {}
-            constexpr parse_error(
-                parse_error_type type, Rng&& rng, size_t arg_loc, size_t in_arg_loc, refs_type refs = {}
-            ) noexcept : type{type}, loc{std::forward<Rng>(rng), arg_loc, in_arg_loc}, refs{std::move(refs)} {}
-            parse_error(const parse_error&) = delete;
-            parse_error(parse_error&&) = delete;
-            parse_error& operator=(const parse_error&) = delete;
-            parse_error& operator=(parse_error&&) = delete;
-
-            auto print(std::output_iterator<format_char_type> auto out) const
-            requires output_enabled {
-                return std::format_to(
-                    out, config.error_tmpl, config.parse_error_msgs[std::to_underlying(type)],
-                    loc, typename usage_range<config.ref_tmpl>::type{refs}
-                );
-            }
-        };
         struct var_name {
-            size_t index;
+            std::size_t index;
             consteval var_name(const char_type* name) noexcept {
                 std::array<bool, Info.var_names.size()> match;
-                for (size_t i = 1; i < match.size(); ++i) {
+                for (std::size_t i = 1; i < match.size(); ++i) {
                     match[i] = (name == Info.var_names[i]);
                 }
                 auto search = ranges::find(match | views::drop(1), true);
@@ -243,9 +199,9 @@ namespace cmd {
             }
         };
         struct flag_name {
-            size_t index;
+            std::size_t index;
             consteval flag_name(const char_type* name) noexcept {
-                const size_t h = get_hash<hash_type, Info.flag_set.size()>(name);
+                const std::size_t h = get_hash<hash_type, Info.flag_set.size()>(name);
                 if (name == Info.flag_set[h].name) [[likely]] {
                     index = h;
                 } else {
@@ -253,16 +209,106 @@ namespace cmd {
                 }
             }
         };
-        std::array<std::basic_string_view<char_type>, Info.var_names.size()> _vars{}; // starts from 1
-        std::bitset<Info.flag_set.size()> _flags{};
-        static constexpr refs_type search_refs(size_t node_loc) noexcept {
+        std::array<std::pair<string_type, error_loc>, Info.var_names.size()> vars_{}; // starts from 1
+        std::bitset<Info.flag_set.size()> flags_{};
+        template <int Mode>
+        struct error_ref_wrapper {
+            template <tagged<error_ref_tag> Ref>
+            struct type {
+                using tag = error_ref_c_tag;
+                using super_type = parser;
+                static constexpr int mode = Mode;
+                const Ref& ref;
+            };
+        };
+        template <typename Rng>
+        struct error_ref {
+            using tag = error_ref_tag;
+            using super_type = parser;
+            receiver_type_t<Rng> args;
+            error_loc loc;
+            explicit constexpr error_ref(Rng&& rng) :
+                args{std::forward<Rng>(rng)}, loc{-1uz} {}
+            constexpr error_ref(Rng&& rng, error_loc loc) :
+                args{std::forward<Rng>(rng)}, loc{loc} {}
+            template <int Mode>
+            constexpr auto wrap() const noexcept {
+                return typename error_ref_wrapper<Mode>::type{*this};
+            }
+        };
+    public:
+        template <typename Rng>
+        struct parse_error {
+            using tag = error_tag;
+            using super_type = parser;
+            error_type type;
+            error_ref<Rng&&> ref;
+            refs_type refs;
+
+            constexpr parse_error(error_type type, Rng&& rng, refs_type refs = {}) noexcept :
+                type{type}, ref{std::forward<Rng>(rng)}, refs{std::move(refs)} {}
+            constexpr parse_error(error_type type, Rng&& rng, error_loc loc, refs_type refs = {}) noexcept :
+                type{type}, ref{std::forward<Rng>(rng), loc}, refs{std::move(refs)} {}
+            STALE_CLASS(parse_error)
+
+            auto print(std::output_iterator<format_char_type> auto out) const
+            requires output_enabled {
+                return std::format_to(
+                    out, config.error_tmpl, config.error_msgs[std::to_underlying(type)],
+                    ref, typename usage_range<config.ref_tmpl>::type{refs}, string_type{}
+                );
+            }
+            auto print() const
+            requires output_enabled {
+                return print(std::ostreambuf_iterator{output_stream});
+            }
+        };
+        template <typename Rng>
+        struct argument_error {
+            using tag = error_tag;
+            using super_type = parser;
+            string_type what;
+            error_ref<const Rng&> ref;
+            std::size_t usage_index;
+
+            constexpr argument_error(string_type what, const Rng& args, std::size_t usage_index) noexcept :
+                what{what}, ref{args}, usage_index{usage_index} {}
+            constexpr argument_error(
+                string_type what, const Rng& args, error_loc loc, std::size_t usage_index) noexcept :
+                what{what}, ref{args, loc}, usage_index{usage_index} {}
+            STALE_CLASS(argument_error)
+
+            auto print(std::output_iterator<format_char_type> auto out) const
+            requires output_enabled {
+                return std::format_to(
+                    out, config.error_tmpl, config.error_msgs[std::to_underlying(error_type::invalid_argument)],
+                    ref, typename usage_range<config.ref_tmpl>::type{std::array{Info.usages[usage_index]}}, what
+                );
+            }
+            auto print() const
+            requires output_enabled {
+                return print(std::ostreambuf_iterator{output_stream});
+            }
+        };
+        template <typename Rng>
+        struct parse_result {
+            using tag = parse_result_tag;
+            using super_type = parser;
+            result_type result;
+            std::size_t usage_index;
+            receiver_type_t<Rng&&> args;
+            constexpr parse_result(result_type result, std::size_t usage_index, Rng&& args) :
+                result{result}, usage_index{usage_index}, args{std::forward<Rng>(args)} {}
+        };
+    protected:
+        static constexpr refs_type search_refs(std::size_t node_loc) noexcept {
             using enum parse_node_type;
             std::array<size_t, Info.tree.size()> deque;
             std::array<bool, Info.tree.size()> visited{};
             refs_type refs;
             auto front = deque.begin(), back = front + 1;
             *front = node_loc;
-            auto push = [&back, &visited](size_t node_idx) {
+            auto push = [&back, &visited](std::size_t node_idx) {
                 if (!visited[node_idx]) {
                     *(back++) = node_idx;
                     visited[node_idx] = true;
@@ -271,7 +317,7 @@ namespace cmd {
             while (front != back) {
                 switch (Info.tree[*front].type) {
                     case option: {
-                        size_t next_option = Info.tree[*front].next_placeholder;
+                        std::size_t next_option = Info.tree[*front].next_placeholder;
                         if (next_option) push(next_option);
                         push(Info.tree[*front].next);
                         break;
@@ -290,22 +336,22 @@ namespace cmd {
         template <typename Rng>
         requires RANGE_OF(forward_range, string_type)
         constexpr auto parse(Rng&& args) noexcept {
-            using return_type = std::expected<result_type, parse_error<Rng>>;
             using enum parse_node_type;
-            using enum parse_error_type;
-            result_type out;
+            using enum error_type;
+            using return_type = std::expected<parse_result<Rng>, parse_error<Rng>>;
             auto node = Info.tree.begin();
             auto start_node = node;
             auto arg_current = ranges::begin(args);
             auto arg_end = ranges::end(args);
-            size_t arg_loc = 0;
-            auto next_arg = [&start_node, &node, &arg_current, &arg_loc](size_t next_node_idx) {
+            std::size_t arg_loc = 0;
+            auto next_arg = [&start_node, &node, &arg_current, &arg_loc](std::size_t next_node_idx) {
                 start_node = node = Info.tree.begin() + next_node_idx;
                 ++arg_current; ++arg_loc;
             };
-            auto raise = [&start_node, &args, &arg_loc](parse_error_type err, size_t in_arg_loc = 0) {
+            auto raise = [&start_node, &args, &arg_loc](error_type err, std::size_t in_arg_loc = 0) {
                 return return_type{std::unexpect,
-                    err, std::forward<Rng>(args), arg_loc, in_arg_loc, search_refs(start_node - Info.tree.begin())
+                    err, std::forward<Rng>(args),
+                    error_loc{arg_loc, in_arg_loc}, search_refs(start_node - Info.tree.begin())
                 };
             };
             while (true) {
@@ -331,26 +377,29 @@ namespace cmd {
                         if ((*arg_current).starts_with(config.specials.flag_prefix)) {
                             return raise(flag_cannot_be_variable);
                         }
-                        _vars[node->var_index] = *arg_current;
+                        vars_[node->var_index] = {*arg_current, {arg_loc, 0}};
                         next_arg(node->next);
                         continue;
                     case end:
-                        out = Info.usages[node->var_index].name;
+                        break;
                 }
                 break;
             }
             for (;arg_current != arg_end; ++arg_current) {
                 std::basic_string_view<char_type> flag_str = *arg_current;
                 if (flag_str.starts_with(config.specials.flag_prefix)) [[likely]] {
-                    const size_t eq_pos = flag_str.find(config.specials.equal);
+                    const std::size_t eq_pos = flag_str.find(config.specials.equal);
                     std::basic_string_view<char_type> flag_name = flag_str.substr(0, eq_pos);
-                    const size_t h = get_hash<hash_type, Info.flag_set.size()>(flag_name);
+                    const std::size_t h = get_hash<hash_type, Info.flag_set.size()>(flag_name);
                     const auto& flag = Info.flag_set[h];
                     if (flag.name == flag_name && flag.defined_for[node->usage_index]) [[likely]] {
-                        _flags[h] = true;
+                        flags_[h] = true;
                         if (eq_pos != flag_str.npos) {
-                            if (size_t var_index = flag.var_index_for[node->usage_index]) [[likely]] {
-                                _vars[var_index] = flag_str.substr(eq_pos + config.specials.equal.size());
+                            if (std::size_t var_index = flag.var_index_for[node->usage_index]) [[likely]] {
+                                vars_[var_index] = {
+                                    flag_str.substr(eq_pos + config.specials.equal.size()),
+                                    {arg_loc, eq_pos + 1}
+                                };
                             } else {
                                 return raise(flag_does_not_accept_argument, eq_pos);
                             }
@@ -362,7 +411,8 @@ namespace cmd {
                     return raise(too_many_arguments);
                 }
             }
-            return return_type{out};
+            return return_type{std::in_place,
+                Info.usages[node->usage_index].name, node->usage_index, std::forward<Rng>(args)};
         }
         constexpr auto parse(int argc, const char_type** argv) noexcept {
             return parse(views::counted(argv + 1, argc - 1) | views::transform(to_string));
@@ -370,8 +420,8 @@ namespace cmd {
         template <typename Iter>
         requires ITER_OF(input_iterator, char_type)
         constexpr auto parse(Iter it) {
-            using enum parse_error_type;
-            static std::vector<std::basic_string<char_type>> args;
+            using enum error_type;
+            std::vector<std::basic_string<char_type>> args;
             args.assign({{}});
             bool quote_open = false, escape = false;
             for (; *it != config.specials.enter; ++it) {
@@ -406,16 +456,21 @@ namespace cmd {
             }
             if (args.front().empty()) args.clear();
 
-            auto get_return = [this]() {return parse(args | views::transform(to_string));};
+            auto get_return = [this, &args]() {return parse(std::move(args) | views::transform(to_string));};
             using return_type = std::invoke_result_t<decltype(get_return)>;
             if (quote_open || escape) [[unlikely]] {
-                return return_type{std::unexpect, open_special_character, args | views::transform(to_string)};
+                return return_type{std::unexpect, open_special_character, std::move(args) | views::transform(to_string)};
             }
             return get_return();
         }
         auto parse()
         requires input_enabled {
             return parse(std::istreambuf_iterator<char_type>(input_stream));
+        }
+        template <typename Rng>
+        constexpr argument_error<std::remove_reference_t<Rng>> raise_argument_error(
+            const parse_result<Rng>& result, var_name name, string_type what) const noexcept {
+            return {what, result.args, vars_[name.index].second, result.usage_index};
         }
         void print_man(std::output_iterator<char_type> auto out, const auto&... args) const
         requires output_enabled {
@@ -429,17 +484,17 @@ namespace cmd {
             print_man(std::ostreambuf_iterator{output_stream}, args...);
         }
         constexpr std::basic_string_view<char_type> var(var_name name) const noexcept {
-            return _vars[name.index];
+            return vars_[name.index].first;
         }
         constexpr bool flag(flag_name name) const noexcept {
-            return _flags[name.index];
+            return flags_[name.index];
         }
         constexpr void reset() noexcept {
-            _vars.fill({});
-            _flags.reset();
+            vars_.fill({});
+            flags_.reset();
         }
     };
-    constexpr size_t usage_parse_msg_max_size = 128;
+    constexpr std::size_t usage_parse_msg_max_size = 128;
     template <auto& Config>
     class usage_parse_error {
     public:
@@ -450,7 +505,7 @@ namespace cmd {
     private:
         static constexpr std::string_view intro = "Parse error.\n \032 | \032\n \032 | \032\n\032";
         static constexpr std::string_view ref_fallback = "Preview is not available if char_type is not char.";
-        static constexpr size_t ref_size = []() -> size_t {
+        static constexpr std::size_t ref_size = []() -> std::size_t {
             if constexpr (ref_enabled) {
                 return ranges::max(Config.usages | views::transform([](const auto& usage) {
                     return usage.format.size();
@@ -459,14 +514,14 @@ namespace cmd {
                 return ref_fallback.size();
             }
         }();
-        static constexpr size_t num_max_size = sizeof(size_t) * CHAR_BIT / 3; // overestimation
+        static constexpr std::size_t num_max_size = sizeof(std::size_t) * CHAR_BIT / 3; // overestimation
     public:
-        static constexpr size_t what_size =
+        static constexpr std::size_t what_size =
             intro.size() + (num_max_size + ref_size) * 2 + usage_parse_msg_max_size; // +'\0'
     private:
         std::array<char, what_size> _what{}; // null-terminated
     public:
-        constexpr usage_parse_error(std::string_view msg, size_t usage_idx, size_t loc) noexcept {
+        constexpr usage_parse_error(std::string_view msg, std::size_t usage_idx, std::size_t loc) noexcept {
             auto sec_start = intro.begin(), sec_end = sec_start - 1;
             char* current = _what.data();
             auto copy_sec = [&sec_start, &sec_end, &current]() {
@@ -476,7 +531,7 @@ namespace cmd {
             };
             copy_sec();
             char* after_num = std::to_chars(current, &*_what.end(), usage_idx + 1).ptr;
-            size_t num_size = after_num - current;
+            std::size_t num_size = after_num - current;
             current = after_num;
             copy_sec();
             if constexpr (ref_enabled) {
@@ -497,7 +552,7 @@ namespace cmd {
         }
     };
 #define chk_err(msg) static_assert(sizeof(msg) - 1 <= usage_parse_msg_max_size, "Error message is too long!")
-    template <const auto& Config, typename CharT, typename Hash, size_t FlagSetSize>
+    template <const auto& Config, typename CharT, typename Hash, std::size_t FlagSetSize>
     constexpr auto _parse_usage(auto out) noexcept ->
     std::expected<parser_def<std::remove_cvref_t<decltype(Config)>>, usage_parse_error<Config>> {
 #if __cpp_static_assert >= 202306L
@@ -528,7 +583,7 @@ namespace cmd {
                         raise("Unmatched '(' when declaring a compound option.");
                     }
                 }
-                size_t start_node_index = tree.size();
+                std::size_t start_node_index = tree.size();
                 auto rng = t | views::split(Config.specials.compound_divider);
                 auto it = rng.begin();
                 if (!compound && (ranges::advance(it, 2, rng.end()) == 0)) [[unlikely]] {
@@ -554,7 +609,7 @@ namespace cmd {
                 }
                 return std::nullopt;
             };
-            auto add_var = [&var_names] (string_type name) -> size_t {
+            auto add_var = [&var_names] (string_type name) -> std::size_t {
                 auto search = ranges::find(var_names, name);
                 if (search == var_names.end()) {
                     var_names.push_back(name);
@@ -565,7 +620,7 @@ namespace cmd {
             };
             bool searching = !tree.empty();
             bool ended = false;
-            size_t current = 0, prev; // current: final value is first unmatched node
+            std::size_t current = 0, prev; // current: final value is first unmatched node
             string_type t = usage.format;
             std::bitset<FlagSetSize> usage_flag_set;
             for (const auto& token : usage.format | views::split(Config.specials.delimiter)) {
@@ -579,9 +634,9 @@ namespace cmd {
                         if (!t.starts_with('-')) [[unlikely]] {
                             raise("Flags must be enclosed with a single pair of '[' and ']' and start with '-'.");
                         }
-                        size_t eq_pos = t.find(Config.specials.equal);
+                        std::size_t eq_pos = t.find(Config.specials.equal);
                         string_type flag_name = t.substr(0, eq_pos);
-                        size_t h = get_hash<Hash, FlagSetSize>(flag_name);
+                        std::size_t h = get_hash<Hash, FlagSetSize>(flag_name);
                         auto& flag = flag_set[h];
                         if (flag.defined()) {
                             if (flag.name != flag_name) [[unlikely]] {
@@ -712,7 +767,7 @@ namespace cmd {
     using config_type_of = std::remove_cvref_t<decltype(Config)>::super_type;
     template <
         config_instance auto& Config,
-        size_t FlagSetSize = 512,
+        std::size_t FlagSetSize = 512,
         typename Hash = hash<std::basic_string_view<typename config_type_of<Config>::char_type>>
     >
     requires requires(std::basic_string_view<typename config_type_of<Config>::char_type> str) {
@@ -749,7 +804,7 @@ struct std::formatter<Rng, typename Rng::format_char_type> {
     }
 };
 
-template <cmd::tagged<cmd::parse_error_tag> Error>
+template <cmd::tagged<cmd::error_tag> Error>
 struct std::formatter<Error, typename Error::super_type::format_char_type> {
     constexpr auto parse(auto& ctx) {
         return ctx.begin();
@@ -759,45 +814,46 @@ struct std::formatter<Error, typename Error::super_type::format_char_type> {
     }
 };
 
-template <cmd::tagged<cmd::parse_error_loc_tag> Loc>
-struct std::formatter<Loc, typename Loc::super_type::format_char_type> {
-    using parser_type = Loc::super_type;
+template <cmd::tagged<cmd::error_ref_tag> Ref>
+struct std::formatter<Ref, typename Ref::super_type::format_char_type> {
+    using parser_type = Ref::super_type;
     constexpr auto parse(auto& ctx) {
         return ctx.begin();
     }
-    constexpr auto format(const Loc& loc, auto& ctx) const {
+    constexpr auto format(const Ref& ref, auto& ctx) const {
         constexpr const auto& config = parser_type::config;
-        if (loc.arg_loc == -1uz) {
+        if (ref.loc.arg_loc == -1uz) {
             return ctx.out();
         } else {
-            auto out = std::format_to(ctx.out(), config.ref_tmpl, loc.template wrap<0>());
-            return std::format_to(out, config.ref_tmpl, loc.template wrap<1>());
+            auto out = std::format_to(ctx.out(), config.ref_tmpl, ref.template wrap<0>());
+            return std::format_to(out, config.ref_tmpl, ref.template wrap<1>());
         }
     }
 };
 
-template <cmd::tagged<cmd::parse_error_loc_c_tag> LocC>
-struct std::formatter<LocC, typename LocC::super_type::format_char_type> {
-    using parser_type = LocC::super_type;
+template <cmd::tagged<cmd::error_ref_c_tag> RefC>
+struct std::formatter<RefC, typename RefC::super_type::format_char_type> {
+    using parser_type = RefC::super_type;
     constexpr auto parse(auto& ctx) {
         return ctx.begin();
     }
-    constexpr auto format(const LocC& loc_c, auto& ctx) const {
+    constexpr auto format(const RefC& ref_c, auto& ctx) const {
         auto out = ctx.out();
-        const auto& loc = loc_c.loc;
+        const auto& ref = ref_c.ref;
         constexpr const auto& specials = parser_type::config.specials;
         bool first = true, indicated = false;
-        for (auto [i, arg] : views::enumerate(loc.rng)) {
+        std::size_t i = 0;
+        for (auto arg : ref.args) {
             if (first) {
                 first = false;
             } else {
                 *(out++) = specials.delimiter;
             }
-            if constexpr (LocC::mode == 0) {
+            if constexpr (RefC::mode == 0) {
                 out = ranges::copy(arg, out).out;
-            } else if constexpr (LocC::mode == 1) {
-                for (size_t j = 0; j < arg.size(); ++j) {
-                    if ((i == loc.arg_loc) && (j == loc.in_arg_loc)) [[unlikely]] {
+            } else if constexpr (RefC::mode == 1) {
+                for (std::size_t j = 0; j < arg.size(); ++j) {
+                    if ((i == ref.loc.arg_loc) && (j == ref.loc.in_arg_loc)) [[unlikely]] {
                         *(out++) = specials.indicator;
                         indicated = true;
                     } else {
@@ -805,8 +861,9 @@ struct std::formatter<LocC, typename LocC::super_type::format_char_type> {
                     }
                 }
             }
+            ++i;
         }
-        if ((LocC::mode == 1) && !indicated) {
+        if ((RefC::mode == 1) && !indicated) {
             *(out++) = specials.indicator;
         }
         return out;

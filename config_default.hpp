@@ -10,7 +10,7 @@ namespace cmd {
         static constexpr format_string_type man_tmpl =\
             FmtCharT_prefix##"{0}\n\033[36mUsages:\033[0m\n{1}";\
         static constexpr format_string_type error_tmpl =\
-            FmtCharT_prefix##"\033[31mError:\033[0m {0}\n{1}\033[36mClosest usages:\033[0m\n{2}";\
+            FmtCharT_prefix##"\033[31mError:\033[0m {0}{3}\n{1}\033[36mClosest usages:\033[0m\n{2}";\
         static constexpr format_string_type ref_tmpl =\
             FmtCharT_prefix##"| {}\n";\
         static constexpr special_chars<CharT> specials = {\
@@ -20,14 +20,15 @@ namespace cmd {
             CharT_prefix##"[", CharT_prefix##"]", CharT_prefix##"-",\
             CharT_prefix##"<", CharT_prefix##">", CharT_prefix##"="\
         };\
-        static constexpr std::array<format_string_type, 7> parse_error_msgs = {\
+        static constexpr std::array<format_string_type, error_types_n> error_msgs = {\
             FmtCharT_prefix##"Unknown option.",\
             FmtCharT_prefix##"Too many arguments.",\
             FmtCharT_prefix##"Too few arguments.",\
             FmtCharT_prefix##"A flag cannot be assigned to a variable.",\
             FmtCharT_prefix##"Unknown flag.",\
             FmtCharT_prefix##"Flag does not accept argument.",\
-            FmtCharT_prefix##"At least one special character is still open."\
+            FmtCharT_prefix##"At least one special character is still open.",\
+            FmtCharT_prefix##"Invalid argument:"\
         };\
     };
     CONFIG_DEFAULT(char, , char, )

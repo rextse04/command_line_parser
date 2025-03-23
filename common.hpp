@@ -12,6 +12,11 @@
     ranges::rng_type<std::remove_cvref_t<Rng>> &&\
     std::is_same_v<ranges::range_value_t<std::remove_cvref_t<Rng>>, type>\
 )
+#define STALE_CLASS(name)\
+    name(const name&) = delete;\
+    name(name&&) = delete;\
+    name& operator=(const name&) = delete;\
+    name& operator=(name&&) = delete;
 
 namespace cmd {
     namespace ranges = std::ranges;
@@ -40,6 +45,21 @@ namespace cmd {
     template <typename Ref, typename T>
     using follow_const_t = follow_const<Ref, T>::type;
 
+    template <typename>
+    struct receiver_type;
+    template <typename T>
+    struct receiver_type<T&> {
+        static constexpr bool owning = false;
+        using type = const std::remove_reference_t<T>&;
+    };
+    template <typename T>
+    struct receiver_type<T&&> {
+        static constexpr bool owning = true;
+        using type = std::remove_reference_t<T>;
+    };
+    template <typename T>
+    using receiver_type_t = typename receiver_type<T>::type;
+
     template <template <typename...> typename, typename>
     struct is_template_instance : std::false_type {};
     template <template <typename...> typename Tmpl, typename... Ts>
@@ -54,12 +74,4 @@ namespace cmd {
     concept tagged = std::same_as<typename T::tag, Tag>;
     template <typename T, typename Ref>
     concept equiv_to = std::is_same_v<std::remove_cvref_t<Ref>, T>;
-
-    template <size_t N, typename T>
-    requires (std::is_arithmetic_v<T>)
-    constexpr T pow(T val) {
-        if constexpr(N == 0) return 1;
-        else if constexpr(N == 1) return val;
-        else return val * pow<N-1, T>(val);
-    }
 }

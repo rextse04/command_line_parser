@@ -4,10 +4,11 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/mpl/list.hpp>
 #include <parser.hpp>
+#include <config_default.hpp>
 #include <print>
 
 BOOST_AUTO_TEST_CASE(parse_checks) {
-    using enum cmd::parse_error_type;
+    using enum cmd::error_type;
     static constexpr cmd::config<int>::type config{
         "Test application",
         {
@@ -25,9 +26,11 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
         std::string_view input = "test arg1  arg2 --test_flag=\"test var\"\n";
         auto res = parser.parse(input.begin());
         BOOST_CHECK(res.has_value());
-        BOOST_CHECK_EQUAL(*res, 1);
+        BOOST_CHECK_EQUAL(res->result, 1);
         BOOST_CHECK(parser.flag("--test_flag"));
         BOOST_CHECK_EQUAL(parser.var("var"), "test var");
+        parser.raise_argument_error(*res, "var", " no good.").print();
+        std::println();
     }
 
     {
@@ -35,7 +38,7 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
         std::string_view input = "test arg3 arg6 \"\\\\test var\"\n";
         auto res = parser.parse(input.begin());
         BOOST_CHECK(res.has_value());
-        BOOST_CHECK_EQUAL(*res, 2);
+        BOOST_CHECK_EQUAL(res->result, 2);
         BOOST_CHECK_EQUAL(parser.var("var"), "\\test var");
     }
 
@@ -104,7 +107,7 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
         std::string_view input = "\n";
         auto res = parser.parse(input.begin());
         BOOST_CHECK(res.has_value());
-        BOOST_CHECK_EQUAL(*res, 3);
+        BOOST_CHECK_EQUAL(res->result, 3);
         BOOST_CHECK_EQUAL(parser.var("var"), "");
         BOOST_CHECK(!parser.flag("--test_flag"));
     }
@@ -162,7 +165,7 @@ BOOST_AUTO_TEST_CASE(static_checks) {
 
 BOOST_AUTO_TEST_CASE(wchar_test) {
     {
-        using enum cmd::parse_error_type;
+        using enum cmd::error_type;
         static constexpr cmd::config<int, wchar_t, wchar_t>::type config{
             L"Test application",
             {
@@ -180,7 +183,7 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
             std::wstring_view input = L"test arg1  arg2 --test_flag=\"test var\"\n";
             auto res = parser.parse(input.begin());
             BOOST_CHECK(res.has_value());
-            BOOST_CHECK_EQUAL(*res, 1);
+            BOOST_CHECK_EQUAL(res->result, 1);
             BOOST_CHECK(parser.flag(L"--test_flag"));
             BOOST_CHECK(parser.var(L"var") == L"test var");
         }
@@ -190,7 +193,7 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
             std::wstring_view input = L"test arg3 arg6 \"\\\\test var\"\n";
             auto res = parser.parse(input.begin());
             BOOST_CHECK(res.has_value());
-            BOOST_CHECK_EQUAL(*res, 2);
+            BOOST_CHECK_EQUAL(res->result, 2);
             BOOST_CHECK(parser.var(L"var") == L"\\test var");
         }
 
@@ -200,7 +203,7 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
             auto res = parser.parse(input.begin());
             BOOST_CHECK(!res.has_value());
             BOOST_CHECK(res.error().type == unknown_option);
-            res.error().print(std::ostreambuf_iterator{std::wcout});
+            res.error().print();
             std::println();
         }
     }
