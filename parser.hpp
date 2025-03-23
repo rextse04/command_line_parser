@@ -423,7 +423,7 @@ namespace cmd {
             return return_type{std::in_place,
                 Info.usages[node->usage_index].name, node->usage_index, std::forward<Rng>(args)};
         }
-        constexpr auto parse(int argc, const char_type** argv) noexcept {
+        constexpr auto parse(int argc, char_type* argv[]) noexcept {
             return parse(views::counted(argv + 1, argc - 1) | views::transform(to_string));
         }
         template <typename Iter>
