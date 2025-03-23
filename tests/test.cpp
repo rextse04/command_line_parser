@@ -23,8 +23,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
     parser.print_man();
 
     {
-        std::string_view input = "test arg1  arg2 --test_flag=\"test var\"\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg1  arg2 --test_flag=\"test var\"";
+        auto res = parser.parse(input);
         BOOST_CHECK(res.has_value());
         BOOST_CHECK_EQUAL(res->result, 1);
         BOOST_CHECK(parser.flag("--test_flag"));
@@ -35,8 +35,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "test arg3 arg6 \"\\\\test var\"\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg3 arg6 \"\\\\test var\"";
+        auto res = parser.parse(input);
         BOOST_CHECK(res.has_value());
         BOOST_CHECK_EQUAL(res->result, 2);
         BOOST_CHECK_EQUAL(parser.var("var"), "\\test var");
@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "test arg3 arg4 var\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg3 arg4 var";
+        auto res = parser.parse(input);
         BOOST_CHECK(!res.has_value());
         BOOST_CHECK(res.error().type == unknown_option);
         std::print("{}", res.error());
@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "test arg3 arg5\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg3 arg5";
+        auto res = parser.parse(input);
         BOOST_CHECK(!res.has_value());
         BOOST_CHECK(res.error().type == too_few_arguments);
         std::print("{}", res.error());
@@ -64,8 +64,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "test arg3 arg5 var var2\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg3 arg5 var var2";
+        auto res = parser.parse(input);
         BOOST_CHECK(!res.has_value());
         BOOST_CHECK(res.error().type == too_many_arguments);
         std::print("{}", res.error());
@@ -74,8 +74,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "test arg3 arg5 -var\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg3 arg5 -var";
+        auto res = parser.parse(input);
         BOOST_CHECK(!res.has_value());
         BOOST_CHECK(res.error().type == flag_cannot_be_variable);
         std::print("{}", res.error());
@@ -84,8 +84,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "test arg1 arg2 --unknown_flag\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg1 arg2 --unknown_flag";
+        auto res = parser.parse(input);
         BOOST_CHECK(!res.has_value());
         BOOST_CHECK(res.error().type == unknown_flag);
         std::print("{}", res.error());
@@ -94,8 +94,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "test arg3 arg5 var --bool_flag=var\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "test arg3 arg5 var --bool_flag=var";
+        auto res = parser.parse(input);
         BOOST_CHECK(!res.has_value());
         BOOST_CHECK(res.error().type == flag_does_not_accept_argument);
         std::print("{}", res.error());
@@ -104,8 +104,8 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
 
     {
         parser.reset();
-        std::string_view input = "\n";
-        auto res = parser.parse(input.begin());
+        std::string_view input = "";
+        auto res = parser.parse(input);
         BOOST_CHECK(res.has_value());
         BOOST_CHECK_EQUAL(res->result, 3);
         BOOST_CHECK_EQUAL(parser.var("var"), "");
@@ -180,8 +180,8 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
         parser.print_man();
 
         {
-            std::wstring_view input = L"test arg1  arg2 --test_flag=\"test var\"\n";
-            auto res = parser.parse(input.begin());
+            std::wstring_view input = L"test arg1  arg2 --test_flag=\"test var\"";
+            auto res = parser.parse(input);
             BOOST_CHECK(res.has_value());
             BOOST_CHECK_EQUAL(res->result, 1);
             BOOST_CHECK(parser.flag(L"--test_flag"));
@@ -190,8 +190,8 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
 
         {
             parser.reset();
-            std::wstring_view input = L"test arg3 arg6 \"\\\\test var\"\n";
-            auto res = parser.parse(input.begin());
+            std::wstring_view input = L"test arg3 arg6 \"\\\\test var\"";
+            auto res = parser.parse(input);
             BOOST_CHECK(res.has_value());
             BOOST_CHECK_EQUAL(res->result, 2);
             BOOST_CHECK(parser.var(L"var") == L"\\test var");
@@ -199,8 +199,8 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
 
         {
             parser.reset();
-            std::wstring_view input = L"test arg3 arg4 var\n";
-            auto res = parser.parse(input.begin());
+            std::wstring_view input = L"test arg3 arg4 var";
+            auto res = parser.parse(input);
             BOOST_CHECK(!res.has_value());
             BOOST_CHECK(res.error().type == unknown_option);
             res.error().print();

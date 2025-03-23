@@ -426,39 +426,39 @@ namespace cmd {
         constexpr auto parse(int argc, char_type* argv[]) noexcept {
             return parse(views::counted(argv + 1, argc - 1) | views::transform(to_string));
         }
-        template <typename Iter>
-        requires ITER_OF(input_iterator, char_type)
-        constexpr auto parse(Iter it) {
+        template <typename Rng>
+        requires RANGE_OF(input_range, char_type)
+        constexpr auto parse(const Rng& rng) {
             using enum error_type;
             std::vector<std::basic_string<char_type>> args;
             args.assign({{}});
             bool quote_open = false, escape = false;
-            for (; *it != config.specials.enter; ++it) {
-                if (quote_open || (*it != config.specials.delimiter)) {
+            for (char_type c : rng) {
+                if (quote_open || (c != config.specials.delimiter)) {
                     if (escape) {
                         escape = false;
                     } else {
                         if constexpr (config.specials.quote_open == config.specials.quote_close) {
-                            if (*it == config.specials.quote_open) {
+                            if (c == config.specials.quote_open) {
                                 quote_open = !quote_open;
                                 continue;
                             }
                         } else {
-                            if (*it == config.specials.quote_open) {
+                            if (c == config.specials.quote_open) {
                                 quote_open = true;
                                 continue;
                             }
-                            if (*it == config.specials.quote_close) {
+                            if (c == config.specials.quote_close) {
                                 quote_open = false;
                                 continue;
                             }
                         }
-                        if (*it == config.specials.escape) {
+                        if (c == config.specials.escape) {
                             escape = true;
                             continue;
                         }
                     }
-                    args.back().push_back(*it);
+                    args.back().push_back(c);
                 } else {
                     if (!args.back().empty()) args.push_back({});
                 }
@@ -474,7 +474,8 @@ namespace cmd {
         }
         auto parse()
         requires input_enabled {
-            return parse(std::istreambuf_iterator<char_type>(input_stream));
+            return parse(std::ranges::subrange(
+                std::istreambuf_iterator<char_type>(input_stream), std::istreambuf_iterator<char_type>()));
         }
         template <typename Rng>
         constexpr argument_error<std::remove_reference_t<Rng>> raise_argument_error(
