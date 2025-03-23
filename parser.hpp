@@ -228,10 +228,16 @@ namespace cmd {
             using super_type = parser;
             receiver_type_t<Rng> args;
             error_loc loc;
+
             explicit constexpr error_ref(Rng&& rng) :
                 args{std::forward<Rng>(rng)}, loc{-1uz} {}
             constexpr error_ref(Rng&& rng, error_loc loc) :
                 args{std::forward<Rng>(rng)}, loc{loc} {}
+            constexpr error_ref(const error_ref&) requires(receiver_type<Rng>::owning) = default;
+            constexpr error_ref(error_ref&&) noexcept requires(receiver_type<Rng>::owning) = default;
+            constexpr error_ref &operator=(const error_ref&) requires(receiver_type<Rng>::owning) = default;
+            constexpr error_ref &operator=(error_ref&&) noexcept requires(receiver_type<Rng>::owning) = default;
+
             template <int Mode>
             constexpr auto wrap() const noexcept {
                 return typename error_ref_wrapper<Mode>::type{*this};
@@ -250,7 +256,8 @@ namespace cmd {
                 type{type}, ref{std::forward<Rng>(rng)}, refs{std::move(refs)} {}
             constexpr parse_error(error_type type, Rng&& rng, error_loc loc, refs_type refs = {}) noexcept :
                 type{type}, ref{std::forward<Rng>(rng), loc}, refs{std::move(refs)} {}
-            STALE_CLASS(parse_error)
+            constexpr parse_error(const parse_error&) = default;
+            constexpr parse_error(parse_error&&) noexcept = default;
 
             auto print(std::output_iterator<format_char_type> auto out) const
             requires output_enabled {
@@ -277,7 +284,8 @@ namespace cmd {
             constexpr argument_error(
                 string_type what, const Rng& args, error_loc loc, std::size_t usage_index) noexcept :
                 what{what}, ref{args, loc}, usage_index{usage_index} {}
-            STALE_CLASS(argument_error)
+            constexpr argument_error(const argument_error&) = default;
+            constexpr argument_error(argument_error&&) noexcept = default;
 
             auto print(std::output_iterator<format_char_type> auto out) const
             requires output_enabled {
@@ -300,7 +308,6 @@ namespace cmd {
             receiver_type_t<Rng&&> args;
             constexpr parse_result(result_type result, std::size_t usage_index, Rng&& args) :
                 result{result}, usage_index{usage_index}, args{std::forward<Rng>(args)} {}
-            STALE_CLASS(parse_result)
         };
     protected:
         static constexpr refs_type search_refs(std::size_t node_loc) noexcept {
