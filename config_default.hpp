@@ -8,7 +8,7 @@ namespace cmd {
     struct config_default<CharT, FmtCharT> {\
         using format_string_type = std::basic_string_view<FmtCharT>;\
         static constexpr format_string_type man_tmpl =\
-            FmtCharT_prefix##"{0}\n\033[36mUsages:\033[0m\n{1}";\
+            FmtCharT_prefix##"{0}\n{1}\n\033[36mUsages:\033[0m\n{2}\n{3}";\
         static constexpr format_string_type error_tmpl =\
             FmtCharT_prefix##"\033[31mError:\033[0m {0}{3}\n{1}\033[36mClosest usages:\033[0m\n{2}";\
         static constexpr format_string_type ref_tmpl =\

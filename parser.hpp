@@ -84,8 +84,9 @@ namespace cmd {
         template <size_t N>
         struct type {
             using super_type = config;
-            string_type name;
+            string_type name, description;
             usage<result_type, char_type> usages[N];
+            string_type explanation;
             format_string_type man_tmpl = config_default_type::man_tmpl;
             format_string_type error_tmpl = config_default_type::error_tmpl;
             format_string_type ref_tmpl = config_default_type::ref_tmpl;
@@ -299,6 +300,7 @@ namespace cmd {
             receiver_type_t<Rng&&> args;
             constexpr parse_result(result_type result, std::size_t usage_index, Rng&& args) :
                 result{result}, usage_index{usage_index}, args{std::forward<Rng>(args)} {}
+            STALE_CLASS(parse_result)
         };
     protected:
         static constexpr refs_type search_refs(std::size_t node_loc) noexcept {
@@ -476,7 +478,9 @@ namespace cmd {
         requires output_enabled {
             std::format_to(
                 out, config.man_tmpl,
-                config.name, typename usage_range<config.ref_tmpl>::type{config.usages}, args...
+                config.name, config.description,
+                typename usage_range<config.ref_tmpl>::type{config.usages},
+                config.explanation, args...
             );
         }
         void print_man(const auto&... args) const

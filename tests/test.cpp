@@ -10,8 +10,8 @@
 BOOST_AUTO_TEST_CASE(parse_checks) {
     using enum cmd::error_type;
     static constexpr cmd::config<int>::type config{
-        "Test application",
-        {
+        .name = "Test application",
+        .usages = {
             {"test arg1 arg2 [--test_flag=<var>]", 1},
             {"test (arg3|arg4) (arg5|arg6) <var> [--test_flag=<var2>] [--bool_flag]", 2},
             {"", 3}
@@ -126,40 +126,40 @@ BOOST_AUTO_TEST_CASE(static_checks) {
     using Hash = cmd::hash<std::string_view>;
     static constexpr size_t FlagSetSize = 512;
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test  arg1", 1}}
+        .name = "Test application",
+        .usages = {{"test  arg1", 1}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test arg1", 1}, {"test <var>", 2}, {"test arg2", 3}}
+        .name = "Test application",
+        .usages = {{"test arg1", 1}, {"test <var>", 2}, {"test arg2", 3}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test arg1 [[flag]]", 1}}
+        .name = "Test application",
+        .usages = {{"test arg1 [[flag]]", 1}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test arg1 [--flag] [--flag]", 1}}
+        .name = "Test application",
+        .usages = {{"test arg1 [--flag] [--flag]", 1}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test arg1", 1}, {"test arg1" ,2}}
+        .name = "Test application",
+        .usages = {{"test arg1", 1}, {"test arg1" ,2}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"", 1}, {"" ,2}}
+        .name = "Test application",
+        .usages = {{"", 1}, {"" ,2}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test (|)", 1}}
+        .name = "Test application",
+        .usages = {{"test (|)", 1}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test arg1|arg2", 1}}
+        .name = "Test application",
+        .usages = {{"test arg1|arg2", 1}}
     )
     STATIC_CHECKS_CASE(
-        "Test application",
-        {{"test (arg1|arg2", 1}}
+        .name = "Test application",
+        .usages = {{"test (arg1|arg2", 1}}
     )
 }
 
@@ -167,8 +167,8 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
     {
         using enum cmd::error_type;
         static constexpr cmd::config<int, wchar_t, wchar_t>::type config{
-            L"Test application",
-            {
+            .name = L"Test application",
+            .usages = {
                     {L"test arg1 arg2 [--test_flag=<var>]", 1},
                     {L"test (arg3|arg4) (arg5|arg6) <var> [--test_flag=<var2>] [--bool_flag]", 2},
                     {L"", 3}
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(wchar_test) {
     using Hash = cmd::hash<std::wstring_view>;
     static constexpr size_t FlagSetSize = 512;
     STATIC_CHECKS_CASE(
-        L"Test application",
-        {{L"test  arg1", 1}}
+        .name = L"Test application",
+        .usages = {{L"test  arg1", 1}}
     )
 }
