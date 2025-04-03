@@ -18,7 +18,7 @@ namespace cmd {
             CharT_prefix##'^',\
             CharT_prefix##"(", CharT_prefix##")", CharT_prefix##"|",\
             CharT_prefix##"[", CharT_prefix##"]", CharT_prefix##"-",\
-            CharT_prefix##"<", CharT_prefix##">", CharT_prefix##"="\
+            CharT_prefix##"<", CharT_prefix##">", CharT_prefix##"...", CharT_prefix##"="\
         };\
         static constexpr std::array<format_string_type, error_types_n> error_msgs = {\
             FmtCharT_prefix##"Unknown option.",\

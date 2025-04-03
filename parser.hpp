@@ -7,7 +7,6 @@
 #include <expected>
 #include <iostream>
 #include <climits>
-#include <complex>
 #include <utility>
 #include "common.hpp"
 #include "chartypes.hpp"
@@ -66,7 +65,7 @@ namespace cmd {
         CharT delimiter, enter, quote_open, quote_close, escape, indicator;
         std::basic_string_view<CharT> compound_open , compound_close, compound_divider,
             flag_open, flag_close, flag_prefix,
-            var_open, var_close, equal;
+            var_open, var_close, var_capture, equal;
     };
     struct config_tag;
     template <char_like CharT, char_like FmtCharT>
@@ -98,14 +97,14 @@ namespace cmd {
     concept config_instance = tagged<typename T::super_type, config_tag>;
 
     enum class parse_node_type {
-        option, variable, end
+        option, variable, variable_option, end
     };
     template <char_like CharT>
     struct parse_node {
         parse_node_type type;
+        std::basic_string_view<CharT> option_name;
         union {
-            std::basic_string_view<CharT> option_name{};
-            std::size_t var_index;
+            std::size_t var_index{};
             std::size_t usage_index;
         };
         std::size_t next_placeholder = 0; // 0: no next placeholder
@@ -235,8 +234,8 @@ namespace cmd {
                 args{std::forward<Rng>(rng)}, loc{loc} {}
             constexpr error_ref(const error_ref&) requires(receiver_type<Rng>::owning) = default;
             constexpr error_ref(error_ref&&) noexcept requires(receiver_type<Rng>::owning) = default;
-            constexpr error_ref &operator=(const error_ref&) requires(receiver_type<Rng>::owning) = default;
-            constexpr error_ref &operator=(error_ref&&) noexcept requires(receiver_type<Rng>::owning) = default;
+            constexpr error_ref& operator=(const error_ref&) requires(receiver_type<Rng>::owning) = default;
+            constexpr error_ref& operator=(error_ref&&) noexcept requires(receiver_type<Rng>::owning) = default;
 
             template <int Mode>
             constexpr auto wrap() const noexcept {
@@ -325,7 +324,8 @@ namespace cmd {
             };
             while (front != back) {
                 switch (Info.tree[*front].type) {
-                    case option: {
+                    case option:
+                    case variable_option: {
                         std::size_t next_option = Info.tree[*front].next_placeholder;
                         if (next_option) push(next_option);
                         push(Info.tree[*front].next);
@@ -374,7 +374,11 @@ namespace cmd {
                 }
                 switch (node->type) {
                     case option:
+                    case variable_option:
                         if (node->option_name == *arg_current) {
+                            if (node->type == variable_option) {
+                                vars_[node->var_index] = {*arg_current, {arg_loc, 0}};
+                            }
                             next_arg(node->next);
                         } else if (node->next_placeholder) {
                             node = Info.tree.begin() + node->next_placeholder;
@@ -433,7 +437,7 @@ namespace cmd {
             std::vector<std::basic_string<char_type>> args;
             args.assign({{}});
             bool quote_open = false, escape = false;
-            for (char_type c : rng) {
+            for (const char_type& c : rng) {
                 if (quote_open || (c != config.specials.delimiter)) {
                     if (escape) {
                         escape = false;
@@ -563,218 +567,287 @@ namespace cmd {
             return std::string_view{_what.data()};
         }
     };
+    namespace detail {
 #define chk_err(msg) static_assert(sizeof(msg) - 1 <= usage_parse_msg_max_size, "Error message is too long!")
-    template <const auto& Config, typename CharT, typename Hash, std::size_t FlagSetSize>
-    constexpr auto _parse_usage(auto out) noexcept ->
-    std::expected<parser_def<std::remove_cvref_t<decltype(Config)>>, usage_parse_error<Config>> {
+        template <const auto& Config, typename CharT, typename Hash, std::size_t FlagSetSize>
+        constexpr auto parse_usage(auto out) noexcept ->
+        std::expected<parser_def<std::remove_cvref_t<decltype(Config)>>, usage_parse_error<Config>> {
 #if __cpp_static_assert >= 202306L
-#define rraise(msg, ...)\
-    return std::unexpected{usage_parse_error<Config>{\
-        msg, static_cast<size_t>(i), static_cast<size_t>(t.data() - usage.format.data() __VA_OPT__(+) __VA_ARGS__)\
-    }}
-#define raise(msg, ...)\
-    chk_err(msg);\
-    rraise(msg __VA_OPT__(,) __VA_ARGS__)
+#define RRAISE(msg, ...)\
+return std::unexpected{usage_parse_error<Config>{\
+msg, static_cast<size_t>(i), static_cast<size_t>(t.data() - usage.format.data() __VA_OPT__(+) __VA_ARGS__)\
+}}
+#define RAISE(msg, ...)\
+chk_err(msg);\
+RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
 #else
 #define rraise throw
 #define raise throw
 #endif
-        using string_type = std::basic_string_view<CharT>;
-        using enum parse_node_type;
-        std::vector<parse_node<CharT>> tree;
-        std::vector<string_type> var_names{{}};
-        std::array<flag_info<ranges::size(Config.usages), CharT>, FlagSetSize> flag_set;
-        for (auto [i, usage] : Config.usages | views::enumerate) {
-            auto add_option = [&tree, &i, &usage] [[nodiscard]] (string_type t) ->
-            std::optional<std::unexpected<usage_parse_error<Config>>> {
-                bool compound = t.starts_with(Config.specials.compound_open);
-                if (compound) {
-                    if (t.ends_with(Config.specials.compound_close)) [[likely]] {
-                        t.remove_prefix(1); t.remove_suffix(1);
-                    } else {
-                        raise("Unmatched '(' when declaring a compound option.");
-                    }
-                }
-                std::size_t start_node_index = tree.size();
-                auto rng = t | views::split(Config.specials.compound_divider);
-                auto it = rng.begin();
-                if (!compound && (ranges::advance(it, 2, rng.end()) == 0)) [[unlikely]] {
-                    raise(
-                        "Using | in a non-compound option declaration. "
-                        "If you want to declare a compound option, enclose it with ().",
-                        t.find('|')
-                    );
-                }
-                for (const auto& opt : rng) {
-                    if (opt.empty()) [[unlikely]] {
-                        raise(
-                            "Options cannot be empty. Check if you have added a redundant delimiter ('|').",
-                            opt.data() - t.data()
-                        );
-                    }
-                    tree.push_back({.type = option, .option_name = string_type{opt}});
-                    tree.back().next_placeholder = tree.size();
-                }
-                tree.back().next_placeholder = 0;
-                for (;start_node_index < tree.size(); ++start_node_index) {
-                    tree[start_node_index].next = tree.size();
-                }
-                return std::nullopt;
-            };
-            auto add_var = [&var_names] (string_type name) -> std::size_t {
-                auto search = ranges::find(var_names, name);
-                if (search == var_names.end()) {
-                    var_names.push_back(name);
-                    return var_names.size() - 1;
-                } else {
-                    return search - var_names.begin();
-                }
-            };
-            bool searching = !tree.empty();
-            bool ended = false;
-            std::size_t current = 0, prev; // current: final value is first unmatched node
-            string_type t = usage.format;
-            std::bitset<FlagSetSize> usage_flag_set;
-            for (const auto& token : usage.format | views::split(Config.specials.delimiter)) {
-                t = string_type{token};
-                if (t.empty()) [[unlikely]] {
-                    raise("Options cannot be empty. Check if you have added a redundant delimiter (' ').");
-                }
-                if (t.starts_with(Config.specials.flag_open)) {
-                    if (t.ends_with(Config.specials.flag_close)) [[likely]] {
-                        t.remove_prefix(1); t.remove_suffix(1);
-                        if (!t.starts_with('-')) [[unlikely]] {
-                            raise("Flags must be enclosed with a single pair of '[' and ']' and start with '-'.");
+            using string_type = std::basic_string_view<CharT>;
+            using enum parse_node_type;
+            std::vector<parse_node<CharT>> tree;
+            std::vector<string_type> var_names{{}};
+            std::array<flag_info<ranges::size(Config.usages), CharT>, FlagSetSize> flag_set;
+            for (auto [i, usage] : Config.usages | views::enumerate) {
+                auto add_option =
+                [&tree, &i, &usage] [[nodiscard]]
+                (string_type t, parse_node_type type = option, std::size_t var_index = 0,
+                    std::span<string_type> exclude = {}) ->
+                std::optional<std::unexpected<usage_parse_error<Config>>> {
+                    bool compound = t.starts_with(Config.specials.compound_open);
+                    if (compound) {
+                        if (t.ends_with(Config.specials.compound_close)) [[likely]] {
+                            t.remove_prefix(Config.specials.compound_open.size());
+                            t.remove_suffix(Config.specials.compound_close.size());
+                        } else {
+                            RAISE("Unmatched '(' when declaring a compound option.");
                         }
-                        std::size_t eq_pos = t.find(Config.specials.equal);
-                        string_type flag_name = t.substr(0, eq_pos);
-                        std::size_t h = get_hash<Hash, FlagSetSize>(flag_name);
-                        auto& flag = flag_set[h];
-                        if (flag.defined()) {
-                            if (flag.name != flag_name) [[unlikely]] {
-                                raise("Hash collision when declaring flag.");
+                    }
+                    std::size_t start_node_index = tree.size();
+                    auto rng = t | views::split(Config.specials.compound_divider);
+                    if (rng.empty()) [[unlikely]] {
+                        RAISE("Option lists cannot be empty.");
+                    }
+                    auto it = rng.begin();
+                    if (compound) {
+                        if (t.ends_with(Config.specials.var_capture)) {
+                            t.remove_suffix(Config.specials.var_capture.size());
+                            if (t.empty() || t.ends_with(Config.specials.compound_divider)) {
+                                if (var_index) [[likely]] {
+                                    tree.push_back({
+                                        .type = variable,
+                                        .var_index = var_index,
+                                        .next = tree.size() + 1
+                                    });
+                                    return std::nullopt;
+                                } else {
+                                    RAISE(
+                                        R"(Using a capture ("...") without specifying the capturing variable.)",
+                                        t.size());
+                                }
                             }
-                            if (usage_flag_set[h]) [[unlikely]] {
-                                raise("Re-declaring flag.");
+                        }
+                    } else {
+                        if (ranges::advance(it, 2, rng.end()) == 0) [[unlikely]] {
+                            RAISE(
+                                "Using | in a non-compound option declaration. "
+                                "If you want to declare a compound option, enclose it with ().",
+                                t.find(Config.specials.compound_divider));
+                        }
+                    }
+                    for (const auto& opt : rng) {
+                        string_type opt_t{opt};
+                        if (opt_t.empty()) [[unlikely]] {
+                            RAISE(
+                                "Options cannot be empty. Check if you have added a redundant delimiter ('|').",
+                                opt.data() - t.data()
+                            );
+                        }
+                        if (opt_t == Config.specials.var_capture) [[unlikely]] {
+                            RAISE(
+                                R"(A capture ("...") must be placed as the last option.)",
+                                opt.data() - t.data()
+                            );
+                        }
+                        if (std::ranges::contains(exclude, opt_t)) [[unlikely]] {
+                            RAISE("Variable option is already an option at this position.", opt.data() - t.data());
+                        }
+                        tree.push_back({.type = type, .option_name = string_type{opt}, .var_index = var_index});
+                        tree.back().next_placeholder = tree.size();
+                    }
+                    tree.back().next_placeholder = 0;
+                    for (;start_node_index < tree.size(); ++start_node_index) {
+                        tree[start_node_index].next = tree.size();
+                    }
+                    return std::nullopt;
+                };
+                auto add_var = [&var_names] (string_type name) -> std::size_t {
+                    auto search = ranges::find(var_names, name);
+                    if (search == var_names.end()) {
+                        var_names.push_back(name);
+                        return var_names.size() - 1;
+                    } else {
+                        return search - var_names.begin();
+                    }
+                };
+                bool searching = !tree.empty();
+                bool ended = false;
+                std::size_t current = 0, prev; // current: final value is first unmatched node
+                string_type t = usage.format;
+                std::bitset<FlagSetSize> usage_flag_set;
+                for (const auto& token : usage.format | views::split(Config.specials.delimiter)) {
+                    t = string_type{token};
+                    if (t.empty()) [[unlikely]] {
+                        RAISE("Options cannot be empty. Check if you have added a redundant delimiter (' ').");
+                    }
+                    if (t.starts_with(Config.specials.flag_open)) {
+                        if (t.ends_with(Config.specials.flag_close)) [[likely]] {
+                            t.remove_prefix(Config.specials.flag_open.size());
+                            t.remove_suffix(Config.specials.flag_close.size());
+                            if (!t.starts_with('-')) [[unlikely]] {
+                                RAISE("Flags must be enclosed with a single pair of '[' and ']' and start with '-'.");
+                            }
+                            std::size_t eq_pos = t.find(Config.specials.equal);
+                            string_type flag_name = t.substr(0, eq_pos);
+                            std::size_t h = get_hash<Hash, FlagSetSize>(flag_name);
+                            auto& flag = flag_set[h];
+                            if (flag.defined()) {
+                                if (flag.name != flag_name) [[unlikely]] {
+                                    RAISE("Hash collision when declaring flag.");
+                                }
+                                if (usage_flag_set[h]) [[unlikely]] {
+                                    RAISE("Re-declaring flag.");
+                                }
+                            } else {
+                                flag.name = flag_name;
+                            }
+                            flag.defined_for[i] = true;
+                            usage_flag_set[h] = true;
+                            if (eq_pos != t.npos) {
+                                string_type var_name = t.substr(eq_pos + 1);
+                                if (
+                                    var_name.starts_with(Config.specials.var_open) &&
+                                    var_name.ends_with(Config.specials.var_close)
+                                ) [[likely]] {
+                                    var_name.remove_prefix(1); var_name.remove_suffix(1);
+                                    flag.var_index_for[i] = add_var(var_name);
+                                } else {
+                                    RAISE("A variable declaration must be enclosed with a pair of '<' and '>'.");
+                                }
                             }
                         } else {
-                            flag.name = flag_name;
+                            RAISE("Unclosed '[' when declaring flag.");
                         }
-                        flag.defined_for[i] = true;
-                        usage_flag_set[h] = true;
-                        if (eq_pos != t.npos) {
-                            string_type var_name = t.substr(eq_pos + 1);
-                            if (
-                                var_name.starts_with(Config.specials.var_open) &&
-                                var_name.ends_with(Config.specials.var_close)
-                            ) [[likely]] {
-                                var_name.remove_prefix(1); var_name.remove_suffix(1);
-                                flag.var_index_for[i] = add_var(var_name);
-                            } else {
-                                raise("A variable declaration must be enclosed with a pair of '<' and '>'.");
-                            }
-                        }
-                    } else {
-                        raise("Unclosed '[' when declaring flag.");
+                        ended = true;
+                        continue;
                     }
-                    ended = true;
-                    continue;
-                }
-                if (ended) [[unlikely]] {
-                    raise("Declaring non-flag attributes after declaring the first flag.");
-                }
-                if (t.starts_with(Config.specials.var_open)) {
-                    if (t.ends_with(Config.specials.var_close)) [[likely]] {
-                        t.remove_prefix(1); t.remove_suffix(1);
-                        parse_node<CharT> new_node{
-                            .type = variable,
-                            .var_index = add_var(t),
-                            .next = tree.size() + 1
-                        };
+                    if (ended) [[unlikely]] {
+                        RAISE("Declaring non-flag attributes after declaring the first flag.");
+                    }
+                    if (t.starts_with(Config.specials.var_open)) {
+                        std::size_t var_start = Config.specials.var_open.size(),
+                        var_end = t.find(Config.specials.var_close, var_start);
+                        if (var_end == t.npos) [[unlikely]] {
+                            RAISE("Unclosed < when declaring variable.");
+                        }
+                        std::size_t var_index = add_var(t.substr(var_start, var_end - var_start));
+                        var_end += Config.specials.var_close.size();
+                        parse_node_type type = (var_end == t.size()) ? variable : variable_option;
+                        std::size_t next_placeholder = 0;
+                        std::vector<string_type> prev_opts;
                         if (!tree.empty() && searching) {
-                            while (tree[current].type == option && tree[current].next_placeholder) {
-                                current = tree[current].next_placeholder;
+                            while (tree[current].type == option) {
+                                if (type == variable_option) {
+                                    prev_opts.emplace_back(tree[current].option_name);
+                                }
+                                if (tree[current].next_placeholder) {
+                                    current = tree[current].next_placeholder;
+                                } else {
+                                    break;
+                                }
                             }
                             switch (tree[current].type) {
                                 case option:
                                     tree[current].next_placeholder = tree.size();
                                     break;
                                 case variable:
-                                    raise("Attempt to declare two variables on the same position.");
+                                case variable_option:
+                                    RAISE("Attempt to declare two variables on the same position.");
                                 case end:
                                     tree[prev].next = tree.size();
-                                    new_node.next = current;
+                                    next_placeholder = current;
                                     current = tree.size();
+                                    break;
                             }
                         }
-                        tree.push_back(new_node);
+                        if (type == variable) {
+                            tree.push_back({
+                                .type = variable,
+                                .var_index = var_index,
+                                .next_placeholder = next_placeholder,
+                                .next = tree.size() + 1
+                            });
+                        } else {
+                            t.remove_prefix(var_end);
+                            if (!t.starts_with(Config.specials.equal)) [[unlikely]] {
+                                RAISE("Unexpected character after declaration of variable.");
+                            }
+                            t.remove_prefix(Config.specials.equal.size());
+                            if (!t.starts_with(Config.specials.compound_open)) [[unlikely]] {
+                                RAISE("Expected '(' for declaration of a variable option.");
+                            }
+                            if (auto res = add_option(t, variable_option, var_index, prev_opts)) [[unlikely]] {
+                                return *res;
+                            }
+                            tree.back().next_placeholder = next_placeholder;
+                        }
                         searching = false;
                     } else {
-                        raise("Unclosed < when declaring variable.");
-                    }
-                } else {
-                    if (!tree.empty() && searching) {
-                        while (true) {
-                            switch (tree[current].type) {
-                                case option:
-                                    if (tree[current].option_name == t) {
-                                        prev = current;
-                                        current = tree[current].next;
-                                    } else if (tree[current].next_placeholder) {
-                                        current = tree[current].next_placeholder;
-                                        continue;
-                                    } else {
-                                        tree[current].next_placeholder = tree.size();
+                        if (!tree.empty() && searching) {
+                            while (true) {
+                                switch (tree[current].type) {
+                                    case option:
+                                        if (tree[current].option_name == t) {
+                                            prev = current;
+                                            current = tree[current].next;
+                                        } else if (tree[current].next_placeholder) {
+                                            current = tree[current].next_placeholder;
+                                            continue;
+                                        } else {
+                                            tree[current].next_placeholder = tree.size();
+                                            if (auto res = add_option(t)) return *res;
+                                            searching = false;
+                                        }
+                                        break;
+                                    case variable:
+                                    case variable_option:
+                                        RAISE("Declaring new option after a variable has been declared at the position.");
+                                    case end:
+                                        tree[prev].next = tree.size();
                                         if (auto res = add_option(t)) return *res;
+                                        tree.back().next_placeholder = current;
+                                        tree[current].next = tree.size();
                                         searching = false;
-                                    }
-                                    break;
-                                case variable:
-                                    raise("Declaring new option after a variable has been declared at the position.");
-                                case end:
-                                    tree[prev].next = tree.size();
-                                    if (auto res = add_option(t)) return *res;
-                                    tree.back().next_placeholder = current;
-                                    tree[current].next = tree.size();
-                                    searching = false;
-                                    break;
+                                        break;
+                                }
+                                break;
                             }
-                            break;
+                        } else {
+                            if (auto res = add_option(t)) return *res;
                         }
-                    } else {
-                        if (auto res = add_option(t)) return *res;
                     }
                 }
-            }
-            if (!tree.empty() && tree[current].type == end) [[unlikely]] {
-                raise("Duplicate usage.");
-            }
-            if (searching) {
-                while (tree[current].next_placeholder) {
-                    current = tree[current].next_placeholder;
+                if (!tree.empty() && tree[current].type == end) [[unlikely]] {
+                    RAISE("Duplicate usage.");
                 }
-                tree[current].next_placeholder = tree.size();
+                if (searching) {
+                    while (tree[current].next_placeholder) {
+                        current = tree[current].next_placeholder;
+                    }
+                    tree[current].next_placeholder = tree.size();
+                }
+                tree.push_back({.type = end, .usage_index = static_cast<size_t>(i)});
+#undef RRAISE
+#undef RAISE
             }
-            tree.push_back({.type = end, .usage_index = static_cast<size_t>(i)});
-#undef rraise
-#undef raise
+            if constexpr (!std::is_same_v<decltype(out), std::nullptr_t>) {
+                ranges::copy(Config.usages, out->usages.begin());
+                ranges::copy(tree, out->tree.begin());
+                ranges::copy(var_names, out->var_names.begin());
+                ranges::copy(flag_set, out->flag_set.begin());
+            }
+            return parser_def{
+                .usage_size = ranges::size(Config.usages),
+                .tree_size = tree.size(),
+                .vars_size = var_names.size(),
+                .flag_set_size = FlagSetSize,
+                .var_num = var_names.size(),
+                .config = Config
+            };
         }
-        if constexpr (!std::is_same_v<decltype(out), std::nullptr_t>) {
-            ranges::copy(Config.usages, out->usages.begin());
-            ranges::copy(tree, out->tree.begin());
-            ranges::copy(var_names, out->var_names.begin());
-            ranges::copy(flag_set, out->flag_set.begin());
-        }
-        return parser_def{
-            .usage_size = ranges::size(Config.usages),
-            .tree_size = tree.size(),
-            .vars_size = var_names.size(),
-            .flag_set_size = FlagSetSize,
-            .var_num = var_names.size(),
-            .config = Config
-        };
-    }
 #undef chk_err
+    }
     template <config_instance auto& Config>
     using config_type_of = std::remove_cvref_t<decltype(Config)>::super_type;
     template <
@@ -789,10 +862,10 @@ namespace cmd {
         using config_type = config_type_of<Config>;
         using result_type = config_type::result_type;
         using char_type = config_type::char_type;
-        constexpr auto res = _parse_usage<Config, char_type, Hash, FlagSetSize>(nullptr);
+        constexpr auto res = detail::parse_usage<Config, char_type, Hash, FlagSetSize>(nullptr);
         if constexpr (res) {
             parser_info<result_type, char_type, Hash, *res> info;
-            _parse_usage<Config, char_type, Hash, FlagSetSize>(&info);
+            detail::parse_usage<Config, char_type, Hash, FlagSetSize>(&info);
             return info;
         } else {
 #if __cpp_static_assert >= 202306L

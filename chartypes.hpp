@@ -4,11 +4,8 @@
 
 namespace cmd {
     template <typename CharT>
-    concept char_like = requires(CharT c1, CharT c2, size_t num) {
-        typename std::char_traits<CharT>;
-        requires std::copyable<CharT>;
-        {c1 == c2} -> std::same_as<bool>;
-        {c1 != c2} -> std::same_as<bool>;
+    concept char_like = requires {
+        requires std::equality_comparable<CharT>;
     };
 
     template <char_like>
