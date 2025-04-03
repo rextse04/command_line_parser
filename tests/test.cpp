@@ -204,6 +204,14 @@ BOOST_AUTO_TEST_CASE(static_checks) {
     )
     STATIC_CHECKS_CASE(
         .name = "Test application",
+        .usages = {{"test <var>=(arg1|...|arg2)", 1}}
+    )
+    STATIC_CHECKS_CASE(
+        .name = "Test application",
+        .usages = {{"test (arg1|arg2|...)", 1}}
+    )
+    STATIC_CHECKS_CASE(
+        .name = "Test application",
         .usages = {{"test <var>=arg1", 1}}
     )
 }

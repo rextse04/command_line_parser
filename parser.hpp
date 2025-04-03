@@ -568,14 +568,15 @@ namespace cmd {
         }
     };
     namespace detail {
-#define chk_err(msg) static_assert(sizeof(msg) - 1 <= usage_parse_msg_max_size, "Error message is too long!")
+#define chk_err(msg)\
+static_assert(std::string_view{msg}.size() - 1 <= usage_parse_msg_max_size, "Error message is too long!")
         template <const auto& Config, typename CharT, typename Hash, std::size_t FlagSetSize>
         constexpr auto parse_usage(auto out) noexcept ->
         std::expected<parser_def<std::remove_cvref_t<decltype(Config)>>, usage_parse_error<Config>> {
 #if __cpp_static_assert >= 202306L
 #define RRAISE(msg, ...)\
 return std::unexpected{usage_parse_error<Config>{\
-msg, static_cast<size_t>(i), static_cast<size_t>(t.data() - usage.format.data() __VA_OPT__(+) __VA_ARGS__)\
+    msg, static_cast<size_t>(i), static_cast<size_t>(t.data() - usage.format.data() __VA_OPT__(+) __VA_ARGS__)\
 }}
 #define RAISE(msg, ...)\
 chk_err(msg);\
