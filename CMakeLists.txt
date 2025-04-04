@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 26)
 
 include_directories(.)
 add_subdirectory(./tests)
+add_subdirectory(./example)
 
 add_library(command_line_parser INTERFACE
         parser.hpp

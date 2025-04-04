@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(parse_checks) {
         BOOST_CHECK_EQUAL(res->result, 1);
         BOOST_CHECK(parser.flag("--test_flag"));
         BOOST_CHECK_EQUAL(parser.var("var"), "test var");
-        parser.raise_argument_error(*res, "var", " no good.").print();
+        parser.raise_argument_error(*res, "var", "no good.").print();
         std::println();
     }
 

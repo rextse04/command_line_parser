@@ -179,10 +179,6 @@ namespace cmd {
         static constexpr bool output_enabled = outputtable<char_type, format_char_type>;
         static constexpr auto& input_stream = input_object<char_type>::value;
         static constexpr auto& output_stream = output_object<format_char_type>::value;
-    private:
-        static constexpr auto to_string = [](const auto& obj) noexcept {
-            return string_type{obj};
-        };
         struct var_name {
             std::size_t index;
             consteval var_name(const char_type* name) noexcept {
@@ -208,6 +204,10 @@ namespace cmd {
                     throw std::invalid_argument("Unknown flag. Note that preceding '-'(s) must be included.");
                 }
             }
+        };
+    private:
+        static constexpr auto to_string = [](const auto& obj) noexcept {
+            return string_type{obj};
         };
         std::array<std::pair<string_type, error_loc>, Info.var_names.size()> vars_{}; // starts from 1
         std::bitset<Info.flag_set.size()> flags_{};
@@ -476,10 +476,19 @@ namespace cmd {
             }
             return get_return();
         }
-        auto parse()
+        auto readline()
         requires input_enabled {
-            return parse(std::ranges::subrange(
-                std::istreambuf_iterator<char_type>(input_stream), std::istreambuf_iterator<char_type>()));
+            using iter_type = std::istreambuf_iterator<char_type>;
+            return parse(
+                std::ranges::subrange(iter_type(input_stream), iter_type())
+                | std::views::take_while([](char_type c) {
+                    if (c == input_stream.widen('\n')) {
+                        input_stream.ignore();
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }));
         }
         template <typename Rng>
         constexpr argument_error<std::remove_reference_t<Rng>> raise_argument_error(
@@ -789,6 +798,7 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                             while (true) {
                                 switch (tree[current].type) {
                                     case option:
+                                    case variable_option:
                                         if (tree[current].option_name == t) {
                                             prev = current;
                                             current = tree[current].next;
@@ -802,7 +812,6 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                                         }
                                         break;
                                     case variable:
-                                    case variable_option:
                                         RAISE("Declaring new option after a variable has been declared at the position.");
                                     case end:
                                         tree[prev].next = tree.size();
