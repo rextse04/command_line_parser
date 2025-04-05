@@ -3,7 +3,7 @@ A simple command-line parser inspired by [docopt](https://github.com/docopt/),
 except the parser is generated at compile time using C++23 features 🤗.
 Instead of convoluted classes and functions,
 you define the parser just as you write the manual -
-this header-only library would do the heavy lifting for you.
+this header-only library does the heavy lifting for you.
 
 ## Quick Example
 For a working standalone example, see [this](example/main.cpp).
