@@ -41,6 +41,7 @@ constexpr auto config = []() {
             "Syntax: help\n"
             "Prints this text."
     };
+    // we change the default of flag_prefix so we can allow negative numbers as arguments
     config.specials.flag_prefix = "--";
     return config;
 }();
@@ -50,6 +51,7 @@ constinit cmd::parser<info> parser;
 using number_t = std::complex<double>;
 std::unordered_map<std::string, number_t> vars;
 std::optional<number_t> result;
+// res: std::expected<parse_result, parse_error>
 int run(const auto& res) {
     using enum action;
     if (res) {

@@ -44,8 +44,11 @@ namespace cmd {
     template <typename Ref, typename T>
     using follow_const_t = follow_const<Ref, T>::type;
 
-    template <typename>
-    struct receiver_type;
+    template <typename T>
+    struct receiver_type {
+        static constexpr bool owning = true;
+        using type = T;
+    };
     template <typename T>
     struct receiver_type<T&> {
         static constexpr bool owning = false;
