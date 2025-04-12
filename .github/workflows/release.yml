@@ -1,0 +1,9 @@
+name: Release
+on: release
+jobs:
+    doxygenize:
+        name: Generate Doxygen documentation
+        runs-on: master
+        steps:
+        - name: Doxygenize
+          uses: langroodi/doxygenize@v1.7.0
