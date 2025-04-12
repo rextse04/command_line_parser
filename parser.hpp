@@ -82,8 +82,8 @@ namespace cmd {
             var_open, var_close, var_capture, equal;
     };
     struct config_tag;
-    /// Default values for \code man_tmpl\endcode, \code error_tmpl\endcode, \code ref_tmpl\endcode,
-    /// \code specials\endcode and \code error_msgs\endcode in \code config<CharT, FmtCharT>\endcode.
+    /// Default values for `man_tmpl`, `error_tmpl`, `ref_tmpl`,
+    /// `specials` and `error_msgs` in `config<CharT, FmtCharT>`.
     template <char_like CharT, char_like FmtCharT>
     struct config_default;
     /// Configuration of a parser.
@@ -107,24 +107,24 @@ namespace cmd {
             string_view_type name, description;
             usage_type usages[N];
             string_view_type explanation;
-            /// \code std::basic_format_string<FmtCharT>\endcode that accepts three arguments (in order).
+            /// `std::basic_format_string<FmtCharT>` that accepts three arguments (in order).
             /// \param 0: name of the program
             /// \param 1: description of the program
             /// \param 2: list of usages
             /// \param 3: detailed explanation of usages
             format_string_view_type man_tmpl = config_default_type::man_tmpl;
-            /// \code std::basic_format_string<FmtCharT>\endcode that accepts three arguments (in order).
-            /// \param 0: error message from \code error_msgs\endcode
+            /// `std::basic_format_string<FmtCharT>` that accepts three arguments (in order).
+            /// \param 0: error message from `error_msgs`
             /// \param 1: location of error (in command)
             /// \param 2: list of closest usages
             /// \param 3: extra information (to error message)
             format_string_view_type error_tmpl = config_default_type::error_tmpl;
-            /// \code std::basic_format_string<FmtCharT>\endcode that accepts one argument.
+            /// `std::basic_format_string<FmtCharT>` that accepts one argument.
             /// \param 0: usage string
             format_string_view_type usage_tmpl = config_default_type::usage_tmpl;
             /// Special characters in command parsing.
             special_chars<char_type> specials = config_default_type::specials;
-            /// Order corresponds to order of enums in \code error_type\endcode.
+            /// Order corresponds to order of enums in `error_type`.
             std::array<format_string_view_type, error_types_n> error_msgs = config_default_type::error_msgs;
         };
     };
@@ -139,13 +139,13 @@ namespace cmd {
     template <char_like CharT>
     struct parse_node {
         parse_node_type type;
-        /// Only applicable when \code type\endcode is \code option\endcode or \code variable_option\endcode.
+        /// Only applicable when `type` is `option` or `variable_option`.
         std::basic_string_view<CharT> option_name;
         // Made union for clearer semantics.
         union {
-            /// Only applicable when \code type\endcode is \code variable\endcode or \code variable_option\endcode.
+            /// Only applicable when `type` is `variable` or `variable_option`.
             std::size_t var_index{};
-            /// Only applicable when \code type\endcode is \code end\endcode.
+            /// Only applicable when `type` is `end`.
             std::size_t usage_index;
         };
         /// Index of the next node in the same position. A value of 0 means there is no such node.
@@ -167,13 +167,13 @@ namespace cmd {
         }
     };
 
-    /// A concept that checks if \code Hash\endcode is a "hasher" for \code CharT\endcode.
+    /// A concept that checks if `Hash` is a "hasher" for `CharT`.
     /// \attention Semantic requirement: the hash function must be constexpr.
     template <typename Hash, typename CharT>
     concept hasher = requires(std::basic_string_view<CharT> str) {
         {Hash{}(str)} -> std::same_as<std::size_t>;
     };
-    /// \return hash of str (by hasher \code Hash\endcode) in a set of size \code SetSize\endcode
+    /// \return hash of str (by hasher `Hash`) in a set of size `SetSize`
     template <typename Hash, std::size_t SetSize>
     static constexpr std::size_t get_hash(auto str) noexcept {
         return Hash{}(str) % SetSize;
@@ -214,9 +214,9 @@ namespace cmd {
         std::size_t arg_loc; /// Index of argument. -1: error cannot be pinpointed.
         std::size_t in_arg_loc; /// Index of character in the argument.
     };
-    /// A binding to \code args\endcode.
-    /// It borrows if \code Args\endcode is an l-value reference, or takes ownership otherwise.
-    /// \remark \code receiver\endcode is not copyable nor movable when it borrows from \code args\endcode.
+    /// A binding to `args`.
+    /// It borrows if `Args` is an l-value reference, or takes ownership otherwise.
+    /// \remark `receiver` is not copyable nor movable when it borrows from `args`.
     /// This is to prevent UB from lifetime issues.
     template <typename Args>
     struct receiver {
@@ -258,8 +258,8 @@ namespace cmd {
         static constexpr bool output_enabled = outputtable<char_type, format_char_type>;
         static constexpr auto& input_stream = input_object<char_type>::value;
         static constexpr auto& output_stream = output_object<format_char_type>::value;
-        /// Despite its name, the struct only stores the \code index\endcode of a variable.
-        /// This is because the \code index\endcode is computed at compile time from variable name.
+        /// Despite its name, the struct only stores the `index` of a variable.
+        /// This is because the `index` is computed at compile time from variable name.
         struct var_name {
             std::size_t index;
             consteval var_name(const char_type* name) noexcept {
@@ -275,8 +275,8 @@ namespace cmd {
                 }
             }
         };
-        /// Despite its name, the struct only stores the \code index\endcode of a flag.
-        /// This is because the \code index\endcode is computed at compile time from flag name.
+        /// Despite its name, the struct only stores the `index` of a flag.
+        /// This is because the `index` is computed at compile time from flag name.
         struct flag_name {
             std::size_t index;
             consteval flag_name(const char_type* name) noexcept {
@@ -295,8 +295,8 @@ namespace cmd {
         std::array<std::pair<string_type, error_loc>, Info.var_names.size()> vars_{}; // starts from 1
         std::bitset<Info.flag_set.size()> flags_{};
     public:
-        /// A wrapper for \code error_ref\endcode for \code std::formatter\endcode.
-        /// \tparam Mode: 0 - prints the command (\code ref\endcode)\n
+        /// A wrapper for `error_ref` for `std::formatter`.
+        /// \tparam Mode: 0 - prints the command (`ref`)\n
         /// 1 - prints an indicator (^) at the location of the error
         template <int Mode>
         struct error_ref_wrapper {
@@ -316,10 +316,10 @@ namespace cmd {
             using super_type = parser;
             error_loc loc;
 
-            /// Binds to \code args\endcode and set error location to invalid.
+            /// Binds to `args` and set error location to invalid.
             explicit constexpr error_ref(Args&& args) :
                 receiver<Args>{std::forward<Args>(args)}, loc{-1uz} {}
-            /// Binds to \code args\endcode and set error location to \code loc\endcode.
+            /// Binds to `args` and set error location to `loc`.
             constexpr error_ref(Args&& args, error_loc loc) :
                 receiver<Args>{std::forward<Args>(args)}, loc{loc} {}
 
@@ -328,28 +328,28 @@ namespace cmd {
                 return typename error_ref_wrapper<Mode>::type{*this};
             }
         };
-        /// An error emitted during \code parse\endcode,
-        /// without error location due to incompatible type of \code args\endcode.
+        /// An error emitted during `parse`,
+        /// without error location due to incompatible type of `args`.
         struct part_parse_error {
             using tag = error_tag;
             using super_type = parser;
             error_type type;
             refs_type refs;
         };
-        /// An error emitted during \code parse\endcode.
+        /// An error emitted during `parse`.
         template <typename Args>
         struct parse_error : part_parse_error {
             using tag = error_tag;
             using super_type = parser;
             error_ref<Args> ref;
 
-            /// Make a \code parse_error\endcode whose location cannot be pinpointed
+            /// Make a `parse_error` whose location cannot be pinpointed
             /// \param type: error type
-            /// \param args: an \code forward_range\endcode of arguments that form the command
+            /// \param args: an `forward_range` of arguments that form the command
             /// \param refs: vector of pointers of related usages
             constexpr parse_error(error_type type, Args&& args, refs_type refs = {}) noexcept :
                 part_parse_error{type, std::move(refs)}, ref{std::forward<Args>(args)} {}
-            /// Make a \code parse_error\endcode that has a defined location
+            /// Make a `parse_error` that has a defined location
             /// \param loc: location of the error
             constexpr parse_error(error_type type, Args&& args, error_loc loc, refs_type refs = {}) noexcept :
                 part_parse_error{type, std::move(refs)}, ref{std::forward<Args>(args), loc} {}
@@ -369,8 +369,8 @@ namespace cmd {
             }
         };
         /// An error emitted by the developer for invalid arguments.
-        /// \remark \code ref\endcode always borrows,
-        /// so \code argument_error\endcode is always non-copyable and non-movable.
+        /// \remark `ref` always borrows,
+        /// so `argument_error` is always non-copyable and non-movable.
         template <typename Args>
         struct argument_error {
             using tag = error_tag;
@@ -380,7 +380,7 @@ namespace cmd {
             error_ref<const Args&> ref;
             std::size_t usage_index;
 
-            /// \param args: an \code forward_range\endcode of arguments that form the command
+            /// \param args: an `forward_range` of arguments that form the command
             /// \param loc: location of the error
             constexpr argument_error(
                 string_view_type what, const Args& args, error_loc loc, std::size_t usage_index) noexcept :
@@ -398,15 +398,15 @@ namespace cmd {
                 return print(std::ostreambuf_iterator{output_stream});
             }
         };
-        /// Result of a successful \code parse\endcode,
-        /// without error location due to incompatible type of \code args\endcode.
+        /// Result of a successful `parse`,
+        /// without error location due to incompatible type of `args`.
         struct part_parse_result {
             using tag = parse_result_tag;
             using super_type = parser;
             result_type result;
             std::size_t usage_index;
         };
-        /// Result of a successful \code parse\endcode.
+        /// Result of a successful `parse`.
         template <typename Args>
         requires RANGE_OF(Args, forward_range, string_view_type)
         struct parse_result : part_parse_result, receiver<Args> {
@@ -416,8 +416,8 @@ namespace cmd {
                 part_parse_result{result, usage_index}, receiver<Args>{std::forward<Args>(args)} {}
         };
     protected:
-        /// \param node_loc: index of the last node (in \code Info.tree\endcode)
-        /// reached during \code parse\endcode before error
+        /// \param node_loc: index of the last node (in `Info.tree`)
+        /// reached during `parse` before error
         /// \return: vector of related usages
         static constexpr refs_type search_refs(std::size_t node_loc) noexcept {
             using enum parse_node_type;
@@ -458,10 +458,10 @@ namespace cmd {
             return refs;
         }
     public:
-        /// \param args: an \code input_range\endcode of arguments that form a command
-        /// \return If \code Args\endcode is a forward range,
-        /// return an \code std::expected<parse_result, parse_error>\endcode;
-        /// otherwise, return an \code std::expected<part_parse_result, part_parse_error>\endcode.
+        /// \param args: an `input_range` of arguments that form a command
+        /// \return If `Args` is a forward range,
+        /// return an `std::expected<parse_result, parse_error>`;
+        /// otherwise, return an `std::expected<part_parse_result, part_parse_error>`.
         template <typename Args>
         requires RANGE_OF(Args, input_range, string_view_type)
         constexpr auto parse(Args&& args) noexcept {
@@ -557,18 +557,18 @@ namespace cmd {
             }
         }
         /// \param argc: number of arguments
-        /// \param argv: array of arguments (in \code char_type*\endcode)
-        /// \return \code std::expected<parse_result, parse_error>\endcode
-        /// \remark This method is meant to be called with \code argc\endcode and \code argv\endcode
-        /// from the \code main\endcode function.
-        /// As such, it expects the first argument in \code argv\endcode to be the path of the program,
+        /// \param argv: array of arguments (in `char_type*`)
+        /// \return `std::expected<parse_result, parse_error>`
+        /// \remark This method is meant to be called with `argc` and `argv`
+        /// from the `main` function.
+        /// As such, it expects the first argument in `argv` to be the path of the program,
         /// and therefore discarded.
         constexpr auto parse(int argc, char_type* argv[]) noexcept {
             return parse(views::counted(argv + 1, argc - 1) | views::transform(to_string));
         }
-        /// \param str: an \code input_range\endcode of \code char_type\endcode that forms a command string
-        /// \return \code std::expected<parse_result, parse_error>\endcode
-        /// \remark This method creates a vector of arguments that is parsed from \code str\endcode.
+        /// \param str: an `input_range` of `char_type` that forms a command string
+        /// \return `std::expected<parse_result, parse_error>`
+        /// \remark This method creates a vector of arguments that is parsed from `str`.
         template <typename Str>
         requires RANGE_OF(Str, input_range, char_type)
         constexpr auto parse(const Str& str) {
@@ -616,7 +616,7 @@ namespace cmd {
             return get_return();
         }
         /// Reads and parses a line from standard input.
-        /// \return \code std::expected<parse_result, parse_error>\endcode
+        /// \return `std::expected<parse_result, parse_error>`
         auto readline()
         requires input_enabled {
             using iter_type = std::istreambuf_iterator<char_type>;
@@ -631,7 +631,7 @@ namespace cmd {
                     }
                 }));
         }
-        /// \param result: \code parse_result\endcode from \code parse\endcode
+        /// \param result: `parse_result` from `parse`
         /// \param name: name of the variable that causes the error
         /// \param what: error message
         template <typename Rng>
@@ -639,8 +639,8 @@ namespace cmd {
             const parse_result<Rng>& result, var_name name, string_view_type what) const noexcept {
             return {what, result.args, vars_[name.index].second, result.usage_index};
         }
-        /// Prints program manual to an \code output_iterator\endcode \code out\endcode.
-        /// \param args: extra arguments for \code config.man_tmpl\endcode
+        /// Prints program manual to an `output_iterator` `out`.
+        /// \param args: extra arguments for `config.man_tmpl`
         void print_man(std::output_iterator<char_type> auto out, const auto&... args) const
         requires output_enabled {
             std::format_to(
@@ -654,16 +654,16 @@ namespace cmd {
         requires output_enabled {
             print_man(std::ostreambuf_iterator{output_stream}, args...);
         }
-        /// \return value of variable named \code name\endcode
+        /// \return value of variable named `name`
         constexpr std::basic_string_view<char_type> var(var_name name) const noexcept {
             return vars_[name.index].first;
         }
-        /// \return whether flag named \code name\endcode is set
-        /// \remark The prefix of a flag has to be included in \code name\endcode.
+        /// \return whether flag named `name` is set
+        /// \remark The prefix of a flag has to be included in `name`.
         constexpr bool flag(flag_name name) const noexcept {
             return flags_[name.index];
         }
-        /// Clears values of all variables and sets all flags to \code false\endcode.
+        /// Clears values of all variables and sets all flags to `false`.
         constexpr void reset() noexcept {
             vars_.fill({});
             flags_.reset();
@@ -1010,10 +1010,10 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
     }
     template <config_instance auto& Config>
     using config_type_of = std::remove_cvref_t<decltype(Config)>::super_type;
-    /// \tparam Config: parser configuration (in \code config::type\endcode)
+    /// \tparam Config: parser configuration (in `config::type`)
     /// \tparam FlagSetSize: size of hash set for flags
-    /// \tparam Hash: hasher (of \code string_view_type\endcode)
-    /// \return \code parser_info\endcode
+    /// \tparam Hash: hasher (of `string_view_type`)
+    /// \return `parser_info`
     template <
         config_instance auto& Config,
         std::size_t FlagSetSize = 512,

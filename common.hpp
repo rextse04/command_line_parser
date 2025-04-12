@@ -11,11 +11,6 @@
     ranges::rng_type<std::remove_cvref_t<name>> &&\
     std::is_same_v<ranges::range_value_t<std::remove_cvref_t<name>>, type>\
 )
-#define STALE_CLASS(name, ...)\
-    name(const name&)__VA_OPT__( requires(__VA_ARGS__)) = delete;\
-    name(name&&)__VA_OPT__( requires(__VA_ARGS__)) = delete;\
-    name& operator=(const name&)__VA_OPT__( requires(__VA_ARGS__)) = delete;\
-    name& operator=(name&&)__VA_OPT__( requires(__VA_ARGS__)) = delete;
 
 namespace cmd {
     namespace ranges = std::ranges;

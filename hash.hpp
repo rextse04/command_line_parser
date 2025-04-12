@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace cmd {
-    // same specifications as std::hash, except operator() must be constexpr
+    /// Specialize this template to add a default hasher.
     template <typename T>
     struct hash {};
 
@@ -11,10 +11,11 @@ namespace cmd {
         constexpr size_t polyhash_base = 13; // usually prime
     }
 
+    /// Default hasher for string views of arithmetic \code char_type\endcode.
     template <typename T>
     requires (
         is_template_instance_v<std::basic_string_view, T> &&
-        requires (T::value_type c, size_t num) {{c * num} -> std::convertible_to<size_t>;}
+        requires (typename T::value_type c, size_t num) {{c * num} -> std::convertible_to<size_t>;}
     )
     struct hash<T> {
         constexpr size_t operator()(T s) const noexcept {
