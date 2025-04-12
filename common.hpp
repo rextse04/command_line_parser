@@ -3,13 +3,13 @@
 #include <type_traits>
 #include <concepts>
 
-#define ITER_OF(iter_type, type) (\
-    std::iter_type<std::remove_cvref_t<Iter>> &&\
-    std::is_same_v<typename std::iterator_traits<std::remove_cvref_t<Iter>>::value_type, type>\
+#define ITER_OF(name, iter_type, type) (\
+    std::iter_type<std::remove_cvref_t<name>> &&\
+    std::is_same_v<typename std::iterator_traits<std::remove_cvref_t<name>>::value_type, type>\
 )
-#define RANGE_OF(rng_type, type) (\
-    ranges::rng_type<std::remove_cvref_t<Rng>> &&\
-    std::is_same_v<ranges::range_value_t<std::remove_cvref_t<Rng>>, type>\
+#define RANGE_OF(name, rng_type, type) (\
+    ranges::rng_type<std::remove_cvref_t<name>> &&\
+    std::is_same_v<ranges::range_value_t<std::remove_cvref_t<name>>, type>\
 )
 #define STALE_CLASS(name, ...)\
     name(const name&)__VA_OPT__( requires(__VA_ARGS__)) = delete;\
@@ -44,6 +44,8 @@ namespace cmd {
     template <typename Ref, typename T>
     using follow_const_t = follow_const<Ref, T>::type;
 
+    /// If T is a lvalue reference, \code receiver_type\endcode borrows.
+    /// Otherwise, it takes ownership.
     template <typename T>
     struct receiver_type {
         static constexpr bool owning = true;
@@ -59,6 +61,7 @@ namespace cmd {
         static constexpr bool owning = true;
         using type = std::remove_reference_t<T>;
     };
+    /// Convenience type alias for \code receiver_type::type\endcode.
     template <typename T>
     using receiver_type_t = typename receiver_type<T>::type;
 
