@@ -5,6 +5,7 @@ jobs:
         name: Generate Doxygen documentation
         runs-on: ubuntu-latest
         steps:
+        - run: ls
         - name: Doxygenize
           uses: langroodi/doxygenize@v1.7.0
           with:
