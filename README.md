@@ -100,3 +100,6 @@ If ```=<var>``` is present, an argument is required and captured in ```<var>```,
 otherwise ```--flag``` is a boolean flag.
 
 All other strings are ill-formed.
+
+## Documentation
+[Here](https://rextse04.github.io/command_line_parser/).
