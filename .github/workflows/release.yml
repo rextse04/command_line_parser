@@ -1,9 +1,5 @@
 name: Release
 on: [release, workflow_dispatch]
-env:
-    OUTPUT_DIRECTORY = ./docs
-    INPUT = ./
-    HTML_OUTPUT = ./docs
 jobs:
     doxygenize:
         name: Generate Doxygen documentation
@@ -11,3 +7,5 @@ jobs:
         steps:
         - name: Doxygenize
           uses: langroodi/doxygenize@v1.7.0
+          with:
+              doxygenconf: './docs/Doxyfile'
