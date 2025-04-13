@@ -9,3 +9,5 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Doxygenize
         uses: langroodi/doxygenize@v1.7.0
+        with:
+          htmloutput: './'
