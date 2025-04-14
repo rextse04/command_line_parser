@@ -26,7 +26,6 @@ namespace cmd {
     };
     template <typename CharT, typename FmtCharT>
     concept outputtable = requires {
-        requires output_object<CharT>::enabled;
         requires std::formattable<std::basic_string_view<CharT>, FmtCharT>;
     };
 

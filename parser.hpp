@@ -90,7 +90,7 @@ namespace cmd {
     /// \tparam Result: type for identifying usages
     /// \tparam CharT: input character type
     /// \tparam FmtCharT: output character type
-    template <usage_id Result, char_like CharT = char, char_like FmtCharT = char>
+    template <usage_id Result, char_like CharT = char, char_like FmtCharT = CharT>
     requires outputtable<CharT, FmtCharT>
     struct config {
         using tag = config_tag;

@@ -4,7 +4,7 @@
 
 namespace cmd {
     /// Specialize this template to add a default hasher.
-    template <typename T>
+    template <typename>
     struct hash {};
 
     namespace {
@@ -15,7 +15,7 @@ namespace cmd {
     template <typename T>
     requires (
         is_template_instance_v<std::basic_string_view, T> &&
-        requires (typename T::value_type c, size_t num) {{c * num} -> std::convertible_to<size_t>;}
+        requires (typename T::value_type c, size_t num) {{c * num} -> std::convertible_to<std::size_t>;}
     )
     struct hash<T> {
         constexpr size_t operator()(T s) const noexcept {

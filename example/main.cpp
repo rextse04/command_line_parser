@@ -12,7 +12,7 @@
 static_assert(std::numeric_limits<double>::is_iec559, "This program requires IEEE754 standard.");
 
 enum class action {
-    arithmetic, sqrt, save, read, help
+    arithmetic, sqrt, save, read, help, exit
 };
 constexpr auto config = []() {
     cmd::config<action>::type config{
@@ -23,7 +23,8 @@ constexpr auto config = []() {
             {"sqrt <first> [--real]", action::sqrt},
             {"save <var> [--value=<value>]", action::save},
             {"read <var>", action::read},
-            {"help", action::help}
+            {"help", action::help},
+            {"exit", action::exit}
         },
         .explanation = "\033[36mDescription:\033[0m\n"
             "\033[1mBasic arithmetic\033[0m\n"
@@ -38,8 +39,11 @@ constexpr auto config = []() {
             "Save <value> to variable <var>. If --value is missing, result from the most recent step will be saved."
             "Syntax: read <var>\n"
             "Read variable <var>.\n"
+            "\033[1mMisc.\033[0m\n"
             "Syntax: help\n"
-            "Prints this text."
+            "Prints this text.\n"
+            "Syntax: exit\n"
+            "Exit the program."
     };
     // we change the default of flag_prefix so we can allow negative numbers as arguments
     config.specials.flag_prefix = "--";
@@ -126,6 +130,9 @@ int run(const auto& res) {
                 std::println();
                 return EXIT_SUCCESS;
             }
+            case exit: {
+                return -1;
+            }
         }
         std::cout << *result << '\n';
     } else {
@@ -141,7 +148,7 @@ int main(int argc, char* argv[]) {
         while (true) {
             std::print(">> ");
             auto res = parser.readline();
-            run(res);
+            if (run(res) < 0) return EXIT_SUCCESS;
             parser.reset();
         }
     } else {

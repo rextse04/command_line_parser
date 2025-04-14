@@ -3,6 +3,10 @@
 #include "parser.hpp"
 
 namespace cmd {
+/// \param CharT: char_type
+/// \param CharT_prefix: string literal prefix corresponding to CharT
+/// \param FmtCharT: format_char_type
+/// \param FmtCharT_prefix: string literal prefix corresponding to FmtCharT
 #define CONFIG_DEFAULT(CharT, CharT_prefix, FmtCharT, FmtCharT_prefix)\
     template <>\
     struct config_default<CharT, FmtCharT> {\
@@ -33,5 +37,4 @@ namespace cmd {
     };
     CONFIG_DEFAULT(char, , char, )
     CONFIG_DEFAULT(wchar_t, L, wchar_t, L)
-#undef CONFIG_DEFAULT
 }
