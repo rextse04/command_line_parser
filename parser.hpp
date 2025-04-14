@@ -83,7 +83,7 @@ namespace cmd {
     };
     struct config_tag;
     /// Default values for `man_tmpl`, `error_tmpl`, `ref_tmpl`,
-    /// `specials` and `error_msgs` in `config<CharT, FmtCharT>`.
+    /// `specials` and `error_msgs` in `config`.
     template <char_like CharT, char_like FmtCharT>
     struct config_default;
     /// Configuration of a parser.
