@@ -91,40 +91,39 @@ $(document).ready(function(){initNavTree('config__default_8hpp_source.html','');
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="parser_8hpp.html">parser.hpp</a>&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno"><a class="line" href="namespacecmd.html">    5</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecmd.html">cmd</a> {</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">    6</a></span><span class="preprocessor">#define CONFIG_DEFAULT(CharT, CharT_prefix, FmtCharT, FmtCharT_prefix)\</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">    template &lt;&gt;\</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">    struct config_default&lt;CharT, FmtCharT&gt; {\</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">        using format_string_type = std::basic_string_view&lt;FmtCharT&gt;;\</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">        static constexpr format_string_type man_tmpl =\</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">            FmtCharT_prefix##&quot;\033[4m{0}\033[0m\n{1}\n\033[36mUsages:\033[0m\n{2}{3}&quot;</span>;\</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        static constexpr format_string_type error_tmpl =\</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>            FmtCharT_prefix##&quot;\033[31mError:\033[0m {0}{3}\n{1}\033[36mClosest usages:\033[0m\n{2}&quot;;\</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        static constexpr format_string_type usage_tmpl =\</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>            FmtCharT_prefix##&quot;| {0}\n&quot;;\</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        static constexpr special_chars&lt;CharT&gt; specials = {\</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>            CharT_prefix##&#39; &#39;, CharT_prefix##&#39;\n&#39;, CharT_prefix##&#39;&quot;&#39;, CharT_prefix##&#39;&quot;&#39;, CharT_prefix##&#39;\\&#39;,\</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>            CharT_prefix##&#39;^&#39;,\</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>            CharT_prefix##&quot;(&quot;, CharT_prefix##&quot;)&quot;, CharT_prefix##&quot;|&quot;,\</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>            CharT_prefix##&quot;[&quot;, CharT_prefix##&quot;]&quot;, CharT_prefix##&quot;-&quot;,\</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>            CharT_prefix##&quot;&lt;&quot;, CharT_prefix##&quot;&gt;&quot;, CharT_prefix##&quot;...&quot;, CharT_prefix##&quot;=&quot;\</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        };\</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        static constexpr std::array&lt;format_string_type, error_types_n&gt; error_msgs = {\</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>            FmtCharT_prefix##&quot;Unknown option.&quot;,\</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>            FmtCharT_prefix##&quot;Too many arguments.&quot;,\</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>            FmtCharT_prefix##&quot;Too few arguments.&quot;,\</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>            FmtCharT_prefix##&quot;A flag cannot be assigned to a variable.&quot;,\</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>            FmtCharT_prefix##&quot;Unknown flag.&quot;,\</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>            FmtCharT_prefix##&quot;Flag does not accept argument.&quot;,\</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>            FmtCharT_prefix##&quot;At least one special character is still open.&quot;,\</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>            FmtCharT_prefix##&quot;Invalid argument: &quot;\</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        };\</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    };</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <a class="code hl_define" href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">CONFIG_DEFAULT</a>(<span class="keywordtype">char</span>, , <span class="keywordtype">char</span>, )</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <a class="code hl_define" href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">CONFIG_DEFAULT</a>(<span class="keywordtype">wchar_t</span>, L, <span class="keywordtype">wchar_t</span>, L)</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#undef CONFIG_DEFAULT</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">}</span></div>
-<div class="ttc" id="aconfig__default_8hpp_html_ac4cea0b2db2277df716e88e83ec81741"><div class="ttname"><a href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">CONFIG_DEFAULT</a></div><div class="ttdeci">#define CONFIG_DEFAULT(CharT, CharT_prefix, FmtCharT, FmtCharT_prefix)</div><div class="ttdef"><b>Definition:</b> config_default.hpp:6</div></div>
-<div class="ttc" id="anamespacecmd_html"><div class="ttname"><a href="namespacecmd.html">cmd</a></div><div class="ttdef"><b>Definition:</b> config_default.hpp:5</div></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">   10</a></span><span class="preprocessor">#define CONFIG_DEFAULT(CharT, CharT_prefix, FmtCharT, FmtCharT_prefix)\</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">    template &lt;&gt;\</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">    struct config_default&lt;CharT, FmtCharT&gt; {\</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">        using format_string_type = std::basic_string_view&lt;FmtCharT&gt;;\</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">        static constexpr format_string_type man_tmpl =\</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">            FmtCharT_prefix##&quot;\033[4m{0}\033[0m\n{1}\n\033[36mUsages:\033[0m\n{2}{3}&quot;</span>;\</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        static constexpr format_string_type error_tmpl =\</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>            FmtCharT_prefix##&quot;\033[31mError:\033[0m {0}{3}\n{1}\033[36mClosest usages:\033[0m\n{2}&quot;;\</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        static constexpr format_string_type usage_tmpl =\</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>            FmtCharT_prefix##&quot;| {0}\n&quot;;\</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        static constexpr special_chars&lt;CharT&gt; specials = {\</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>            CharT_prefix##&#39; &#39;, CharT_prefix##&#39;\n&#39;, CharT_prefix##&#39;&quot;&#39;, CharT_prefix##&#39;&quot;&#39;, CharT_prefix##&#39;\\&#39;,\</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>            CharT_prefix##&#39;^&#39;,\</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>            CharT_prefix##&quot;(&quot;, CharT_prefix##&quot;)&quot;, CharT_prefix##&quot;|&quot;,\</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>            CharT_prefix##&quot;[&quot;, CharT_prefix##&quot;]&quot;, CharT_prefix##&quot;-&quot;,\</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>            CharT_prefix##&quot;&lt;&quot;, CharT_prefix##&quot;&gt;&quot;, CharT_prefix##&quot;...&quot;, CharT_prefix##&quot;=&quot;\</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        };\</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        static constexpr std::array&lt;format_string_type, error_types_n&gt; error_msgs = {\</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>            FmtCharT_prefix##&quot;Unknown option.&quot;,\</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>            FmtCharT_prefix##&quot;Too many arguments.&quot;,\</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>            FmtCharT_prefix##&quot;Too few arguments.&quot;,\</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>            FmtCharT_prefix##&quot;A flag cannot be assigned to a variable.&quot;,\</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>            FmtCharT_prefix##&quot;Unknown flag.&quot;,\</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>            FmtCharT_prefix##&quot;Flag does not accept argument.&quot;,\</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>            FmtCharT_prefix##&quot;At least one special character is still open.&quot;,\</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>            FmtCharT_prefix##&quot;Invalid argument: &quot;\</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        };\</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    };</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <a class="code hl_define" href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">CONFIG_DEFAULT</a>(<span class="keywordtype">char</span>, , <span class="keywordtype">char</span>, )</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_define" href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">CONFIG_DEFAULT</a>(<span class="keywordtype">wchar_t</span>, L, <span class="keywordtype">wchar_t</span>, L)</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>}</div>
+<div class="ttc" id="aconfig__default_8hpp_html_ac4cea0b2db2277df716e88e83ec81741"><div class="ttname"><a href="config__default_8hpp.html#ac4cea0b2db2277df716e88e83ec81741">CONFIG_DEFAULT</a></div><div class="ttdeci">#define CONFIG_DEFAULT(CharT, CharT_prefix, FmtCharT, FmtCharT_prefix)</div><div class="ttdef"><b>Definition:</b> <a href="config__default_8hpp_source.html#l00010">config_default.hpp:10</a></div></div>
+<div class="ttc" id="anamespacecmd_html"><div class="ttname"><a href="namespacecmd.html">cmd</a></div><div class="ttdef"><b>Definition:</b> <a href="config__default_8hpp_source.html#l00005">config_default.hpp:5</a></div></div>
 <div class="ttc" id="aparser_8hpp_html"><div class="ttname"><a href="parser_8hpp.html">parser.hpp</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

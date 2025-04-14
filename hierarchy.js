@@ -11,7 +11,7 @@ var hierarchy =
     [ "std::formatter< Ref, typename Ref::super_type::format_char_type >", "structstd_1_1formatter_3_01Ref_00_01typename_01Ref_1_1super__type_1_1format__char__type_01_4.html", null ],
     [ "std::formatter< RefC, typename RefC::super_type::format_char_type >", "structstd_1_1formatter_3_01RefC_00_01typename_01RefC_1_1super__type_1_1format__char__type_01_4.html", null ],
     [ "std::formatter< Rng, typename Rng::format_char_type >", "structstd_1_1formatter_3_01Rng_00_01typename_01Rng_1_1format__char__type_01_4.html", null ],
-    [ "cmd::hash< T >", "structcmd_1_1hash.html", null ],
+    [ "cmd::hash< typename >", "structcmd_1_1hash.html", null ],
     [ "cmd::hash< T >", "structcmd_1_1hash_3_01T_01_4.html", null ],
     [ "cmd::parse_node< CharT >", "structcmd_1_1parse__node.html", null ],
     [ "cmd::parser< Info >", "classcmd_1_1parser.html", null ],

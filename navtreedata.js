@@ -25,11 +25,8 @@
 var NAVTREE =
 [
   [ "Command Line Parser", "index.html", [
-    [ "Command Line Parser", "md_README.html", [
-      [ "Quick Example", "md_README.html#autotoc_md1", null ],
-      [ "Usage Text Grammar", "md_README.html#autotoc_md2", null ],
-      [ "Documentation", "md_README.html#autotoc_md3", null ]
-    ] ],
+    [ "Defining a parser on character types other than <tt>char</tt>", "md_docs_chartypes.html", null ],
+    [ "Usage Text Grammar", "md_docs_grammar.html", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -65,7 +62,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"structcmd_1_1parse__node.html#a10970939eabbb1231b65ef9f7fecc0b5"
+"structcmd_1_1parse__node.html#a8447bb32b229fdcfc60845936c66cacf"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

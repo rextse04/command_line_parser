@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['char_5ftype_0',['char_type',['../classcmd_1_1usage__parse__error.html#abd5298230c33c879e4d960e14f14cd01',1,'cmd::usage_parse_error::char_type()'],['../classcmd_1_1parser.html#a2554227434ed2cdabb950658ef383d27',1,'cmd::parser::char_type()'],['../structcmd_1_1parser__info.html#aa4014d7853d429af040bb2bc96ee7eee',1,'cmd::parser_info::char_type()'],['../structcmd_1_1config.html#ad30cf82dfcf3370c025d3e9f28490028',1,'cmd::config::char_type()'],['../structcmd_1_1detail_1_1usage__range_1_1type.html#a74d2d1e1d6ebbfa1a9275b1fdef9799e',1,'cmd::detail::usage_range::type::char_type()'],['../structcmd_1_1usage.html#aef8f48249bd7551135a1fd2fa52c6a3a',1,'cmd::usage::char_type()']]],
+  ['char_5ftype_0',['char_type',['../classcmd_1_1usage__parse__error.html#abd5298230c33c879e4d960e14f14cd01',1,'cmd::usage_parse_error::char_type()'],['../classcmd_1_1parser.html#a2554227434ed2cdabb950658ef383d27',1,'cmd::parser::char_type()'],['../structcmd_1_1parser__info.html#aa4014d7853d429af040bb2bc96ee7eee',1,'cmd::parser_info::char_type()'],['../structcmd_1_1config.html#ad30cf82dfcf3370c025d3e9f28490028',1,'cmd::config::char_type()'],['../structcmd_1_1usage.html#aef8f48249bd7551135a1fd2fa52c6a3a',1,'cmd::usage::char_type()'],['../structcmd_1_1detail_1_1usage__range_1_1type.html#a74d2d1e1d6ebbfa1a9275b1fdef9799e',1,'cmd::detail::usage_range::type::char_type()']]],
   ['chartypes_2ehpp_1',['chartypes.hpp',['../chartypes_8hpp.html',1,'']]],
-  ['chk_5ferr_2',['chk_err',['../parser_8hpp.html#a48474087a1b4e7d6650f4d45217ee0a5',1,'parser.hpp']]],
-  ['cmd_3',['cmd',['../namespacecmd.html',1,'']]],
-  ['command_20line_20parser_4',['Command Line Parser',['../md_README.html',1,'']]],
+  ['chartypes_2emd_2',['chartypes.md',['../chartypes_8md.html',1,'']]],
+  ['chk_5ferr_3',['chk_err',['../parser_8hpp.html#a48474087a1b4e7d6650f4d45217ee0a5',1,'parser.hpp']]],
+  ['cmd_4',['cmd',['../namespacecmd.html',1,'']]],
   ['common_2ehpp_5',['common.hpp',['../common_8hpp.html',1,'']]],
   ['compound_5fclose_6',['compound_close',['../structcmd_1_1special__chars.html#abee8d61dde1d6c066b8bb14c1a3cd69c',1,'cmd::special_chars']]],
   ['compound_5fdivider_7',['compound_divider',['../structcmd_1_1special__chars.html#a5fac56a5d2aab6a784b7b52f4a19b768',1,'cmd::special_chars']]],

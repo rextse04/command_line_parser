@@ -118,7 +118,7 @@ Public Types</h2></td></tr>
 <tr class="separator:a64866ab59294fc1198ab162f24d7e6a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt;<br />
+<div class="textblock"><div class="compoundTemplParams">template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt;<br />
 requires outputtable&lt;CharT, FmtCharT&gt;<br />
 struct cmd::config&lt; Result, CharT, FmtCharT &gt;</div><p >Configuration of a parser. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -128,6 +128,8 @@ struct cmd::config&lt; Result, CharT, FmtCharT &gt;</div><p >Configuration of a 
   </table>
   </dd>
 </dl>
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00095">95</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ad30cf82dfcf3370c025d3e9f28490028" name="ad30cf82dfcf3370c025d3e9f28490028"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad30cf82dfcf3370c025d3e9f28490028">&#9670;&nbsp;</a></span>char_type</h2>
@@ -135,13 +137,15 @@ struct cmd::config&lt; Result, CharT, FmtCharT &gt;</div><p >Configuration of a 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#ad30cf82dfcf3370c025d3e9f28490028">char_type</a> =  CharT</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00098">98</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -151,13 +155,15 @@ template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&g
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#a64866ab59294fc1198ab162f24d7e6a1">config_default_type</a> =  <a class="el" href="structcmd_1_1config__default.html">config_default</a>&lt;<a class="el" href="structcmd_1_1config.html#ad30cf82dfcf3370c025d3e9f28490028">char_type</a>, <a class="el" href="structcmd_1_1config.html#abe818ecdf1d740c9d06f5245ac7d4bd6">format_char_type</a>&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00103">103</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -167,13 +173,15 @@ template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&g
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#abe818ecdf1d740c9d06f5245ac7d4bd6">format_char_type</a> =  FmtCharT</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00099">99</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -183,13 +191,15 @@ template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&g
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#a79053d58e89a80d4de62731a996da411">format_string_view_type</a> =  std::basic_string_view&lt;<a class="el" href="structcmd_1_1config.html#abe818ecdf1d740c9d06f5245ac7d4bd6">format_char_type</a>&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00101">101</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -199,13 +209,15 @@ template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&g
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#a57d8f5afa04ac31d72c269b7969ddf39">result_type</a> =  Result</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00097">97</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -215,13 +227,15 @@ template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&g
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#a0ad07e1a3c123b172e0ecfcb60506630">string_view_type</a> =  std::basic_string_view&lt;<a class="el" href="structcmd_1_1config.html#ad30cf82dfcf3370c025d3e9f28490028">char_type</a>&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00100">100</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -231,13 +245,15 @@ template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&g
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#a13dd440e0dda4e949cc5f2f0cc3b455c">tag</a> =  config_tag</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00096">96</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -247,13 +263,15 @@ template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&g
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = char&gt; </div>
+template&lt;usage_id Result, char_like CharT = char, char_like FmtCharT = CharT&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="structcmd_1_1config.html">cmd::config</a>&lt; Result, CharT, FmtCharT &gt;::<a class="el" href="structcmd_1_1config.html#ae1104241fc03ff68858b729682c2bf47">usage_type</a> =  <a class="el" href="structcmd_1_1usage.html">usage</a>&lt;<a class="el" href="structcmd_1_1config.html#a57d8f5afa04ac31d72c269b7969ddf39">result_type</a>, <a class="el" href="structcmd_1_1config.html#ad30cf82dfcf3370c025d3e9f28490028">char_type</a>&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00102">102</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
