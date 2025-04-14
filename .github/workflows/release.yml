@@ -8,7 +8,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
       - name: Clone theme
-        run: 'git clone https://github.com/jothepro/doxygen-awesome-css.git'
+        run: 'git submodule add https://github.com/jothepro/doxygen-awesome-css.git'
       - name: Doxygenize
         uses: langroodi/doxygenize@v1.7.0
         with:
