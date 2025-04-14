@@ -328,7 +328,7 @@ namespace cmd {
                 return typename error_ref_wrapper<Mode>::type{*this};
             }
         };
-        /// An error emitted during `parse`,
+        /// An error emitted during `parser::parse`,
         /// without error location due to incompatible type of `args`.
         struct part_parse_error {
             using tag = error_tag;
@@ -336,7 +336,7 @@ namespace cmd {
             error_type type;
             refs_type refs;
         };
-        /// An error emitted during `parse`.
+        /// An error emitted during `parser::parse`.
         template <typename Args>
         struct parse_error : part_parse_error {
             using tag = error_tag;
