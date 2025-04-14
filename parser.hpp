@@ -211,8 +211,10 @@ namespace cmd {
 
     /// Location of an error in a command.
     struct error_loc {
-        std::size_t arg_loc; /// Index of argument. -1: error cannot be pinpointed.
-        std::size_t in_arg_loc; /// Index of character in the argument.
+        /// Index of argument. -1: error cannot be pinpointed.
+        std::size_t arg_loc;
+        /// Index of character in the argument.
+        std::size_t in_arg_loc;
     };
     /// A binding to `args`.
     /// It borrows if `Args` is an l-value reference, or takes ownership otherwise.
