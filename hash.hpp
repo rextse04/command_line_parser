@@ -7,7 +7,7 @@ namespace cmd {
     template <typename>
     struct hash {};
 
-    namespace {
+    namespace detail {
         constexpr size_t polyhash_base = 13; // usually prime
     }
 
@@ -22,7 +22,7 @@ namespace cmd {
             size_t out = 0, term = 1;
             for (auto c : s) {
                 out += c * term;
-                term *= polyhash_base;
+                term *= detail::polyhash_base;
             }
             return out;
         }

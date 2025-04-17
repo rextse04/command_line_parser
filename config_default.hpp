@@ -22,7 +22,7 @@ namespace cmd {
             CharT_prefix##'^',\
             CharT_prefix##"(", CharT_prefix##")", CharT_prefix##"|",\
             CharT_prefix##"[", CharT_prefix##"]", CharT_prefix##"-",\
-            CharT_prefix##"<", CharT_prefix##">", CharT_prefix##"...", CharT_prefix##"="\
+            CharT_prefix##"<", CharT_prefix##">", CharT_prefix##"...", CharT_prefix##"=", CharT_prefix##"..."\
         };\
         static constexpr std::array<format_string_type, error_types_n> error_msgs = {\
             FmtCharT_prefix##"Unknown option.",\
@@ -36,5 +36,13 @@ namespace cmd {
         };\
     };
     CONFIG_DEFAULT(char, , char, )
+    CONFIG_DEFAULT(wchar_t, L, char, )
+    CONFIG_DEFAULT(char8_t, u8, char, )
+    CONFIG_DEFAULT(char16_t, u, char, )
+    CONFIG_DEFAULT(char32_t, U, char, )
+    CONFIG_DEFAULT(char, , wchar_t, L)
     CONFIG_DEFAULT(wchar_t, L, wchar_t, L)
+    CONFIG_DEFAULT(char8_t, u8, wchar_t, L)
+    CONFIG_DEFAULT(char16_t, u, wchar_t, L)
+    CONFIG_DEFAULT(char32_t, U, wchar_t, L)
 }

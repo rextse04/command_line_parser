@@ -5,11 +5,11 @@
 
 #define ITER_OF(name, iter_type, type) (\
     std::iter_type<std::remove_cvref_t<name>> &&\
-    std::is_same_v<typename std::iterator_traits<std::remove_cvref_t<name>>::value_type, type>\
+    std::is_convertible_v<typename std::iterator_traits<std::remove_cvref_t<name>>::reference_type, type>\
 )
 #define RANGE_OF(name, rng_type, type) (\
     ranges::rng_type<std::remove_cvref_t<name>> &&\
-    std::is_same_v<ranges::range_value_t<std::remove_cvref_t<name>>, type>\
+    std::is_convertible_v<ranges::range_reference_t<std::remove_cvref_t<name>>, type>\
 )
 
 namespace cmd {

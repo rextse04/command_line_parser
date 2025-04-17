@@ -6,6 +6,7 @@
 #include <spanstream>
 #include <cmath>
 #include <limits>
+#include <locale>
 #include <parser.hpp>
 #include <config_default.hpp> // for default diagnostic messages
 
@@ -15,16 +16,16 @@ enum class action {
     arithmetic, sqrt, save, read, help, exit
 };
 constexpr auto config = []() {
-    cmd::config<action>::type config{
+    cmd::config<action, char16_t, char>::type config{
         .name = "Calculator",
         .description = "A simple CLI calculator that supports complex numbers.",
         .usages = {
-            {"<op>=(add|minus|mul|div) <first> <second>", action::arithmetic},
-            {"sqrt <first> [--real]", action::sqrt},
-            {"save <var> [--value=<value>]", action::save},
-            {"read <var>", action::read},
-            {"help", action::help},
-            {"exit", action::exit}
+            {u"<op>=(add|minus|mul|div) <first> <second>", action::arithmetic},
+            {u"sqrt <first> [--real] [--ℝ]", action::sqrt},
+            {u"save <var> [--value=<value>]", action::save},
+            {u"read <var>", action::read},
+            {u"help", action::help},
+            {u"exit", action::exit}
         },
         .explanation = "\033[36mDescription:\033[0m\n"
             "\033[1mBasic arithmetic\033[0m\n"
@@ -46,14 +47,14 @@ constexpr auto config = []() {
             "Exit the program."
     };
     // we change the default of flag_prefix so we can allow negative numbers as arguments
-    config.specials.flag_prefix = "--";
+    config.specials.flag_prefix = u"--";
     return config;
 }();
 constexpr auto info = cmd::define_parser<config>();
 constinit cmd::parser<info> parser;
 
 using number_t = std::complex<double>;
-std::unordered_map<std::string, number_t> vars;
+std::unordered_map<std::u16string, number_t> vars;
 std::optional<number_t> result;
 // res: std::expected<parse_result, parse_error>
 int run(const auto& res) {
@@ -61,12 +62,13 @@ int run(const auto& res) {
     if (res) {
         bool success = true;
         auto to_number = [&res, &success](cmd::parser<info>::var_name name, number_t& number) -> void {
-            std::string arg{parser.var(name)};
+            std::u16string arg{parser.var(name)};
             if (vars.contains(arg)) {
                 number = vars[arg];
                 return;
             }
-            std::ispanstream ss(arg);
+            auto carg = cmd::translator<char16_t, char>{}(arg);
+            std::ispanstream ss(carg);
             ss >> number;
             if (ss.fail()) {
                 parser.raise_argument_error(*res, name, "Invalid number.").print();
@@ -75,18 +77,18 @@ int run(const auto& res) {
         };
         switch (res->result) {
             case arithmetic: {
-                std::string_view op = parser.var("op");
+                std::u16string_view op = parser.var(u"op");
                 number_t first, second;
-                to_number("first", first);
-                to_number("second", second);
+                to_number(u"first", first);
+                to_number(u"second", second);
                 if (!success) return EXIT_FAILURE;
-                if (op == "add") {
+                if (op == u"add") {
                     result = first + second;
-                } else if (op == "minus") {
+                } else if (op == u"minus") {
                     result = first - second;
-                } else if (op == "mul") {
+                } else if (op == u"mul") {
                     result = first * second;
-                } else if (op == "div") {
+                } else if (op == u"div") {
                     result = first / second;
                 } else {
                     std::unreachable();
@@ -95,34 +97,34 @@ int run(const auto& res) {
             }
             case sqrt: {
                 number_t first;
-                to_number("first", first);
+                to_number(u"first", first);
                 if (!success) return EXIT_FAILURE;
                 result = std::sqrt(first);
-                if (parser.flag("--real")) {
+                if (parser.flag(u"--real") || parser.flag(u"--ℝ")) {
                     if (result->imag() != 0) result = {NAN, NAN};
                 }
                 break;
             }
             case save: {
-                if (parser.flag("--value")) {
+                if (parser.flag(u"--value")) {
                     number_t number;
-                    to_number("value", number);
+                    to_number(u"value", number);
                     if (!success) return EXIT_FAILURE;
                     result = number;
                 }
                 if (result) {
-                    vars[std::string{parser.var("var")}] = *result;
+                    vars[std::u16string{parser.var(u"var")}] = *result;
                 } else {
                     std::println("Error: No result from previous steps!");
                 }
                 return EXIT_SUCCESS;
             }
             case read: {
-                if (!vars.contains(std::string{parser.var("var")})) {
+                if (!vars.contains(std::u16string{parser.var(u"var")})) {
                     std::println("Error: Unknown variable.");
                     return EXIT_FAILURE;
                 }
-                result = vars[std::string{parser.var("var")}];
+                result = vars[std::u16string{parser.var(u"var")}];
                 break;
             }
             case help: {
@@ -144,6 +146,8 @@ int run(const auto& res) {
 
 int main(int argc, char* argv[]) {
     using enum action;
+    std::locale system_locale("");
+    std::locale::global(system_locale);
     if (argc <= 1) {
         while (true) {
             std::print(">> ");

@@ -11,6 +11,7 @@
 #include "common.hpp"
 #include "chartypes.hpp"
 #include "hash.hpp"
+#include "error.hpp"
 
 namespace cmd {
     /// All types of error that can be raised during parsing.\n
@@ -79,7 +80,7 @@ namespace cmd {
         CharT delimiter, enter, quote_open, quote_close, escape, indicator;
         std::basic_string_view<CharT> compound_open , compound_close, compound_divider,
             flag_open, flag_close, flag_prefix,
-            var_open, var_close, var_capture, equal;
+            var_open, var_close, var_capture, equal, variadic;
     };
     struct config_tag;
     /// Default values for `man_tmpl`, `error_tmpl`, `ref_tmpl`,
@@ -91,7 +92,6 @@ namespace cmd {
     /// \tparam CharT: input character type
     /// \tparam FmtCharT: output character type
     template <usage_id Result, char_like CharT = char, char_like FmtCharT = CharT>
-    requires outputtable<CharT, FmtCharT>
     struct config {
         using tag = config_tag;
         using result_type = Result;
@@ -104,9 +104,9 @@ namespace cmd {
         template <size_t N>
         struct type {
             using super_type = config;
-            string_view_type name, description;
+            format_string_view_type name, description;
             usage_type usages[N];
-            string_view_type explanation;
+            format_string_view_type explanation;
             /// `std::basic_format_string<FmtCharT>` that accepts three arguments (in order).
             /// \param 0: name of the program
             /// \param 1: description of the program
@@ -132,7 +132,7 @@ namespace cmd {
     concept config_instance = tagged<typename T::super_type, config_tag>;
 
     enum class parse_node_type {
-        option, variable, variable_option, end
+        option, variable, variable_option, variadic, end
     };
     /// A node in a parse tree.
     /// \tparam CharT: input character type
@@ -140,11 +140,11 @@ namespace cmd {
     struct parse_node {
         parse_node_type type;
         /// Only applicable when `type` is `option` or `variable_option`.
-        std::basic_string_view<CharT> option_name;
-        // Made union for clearer semantics.
+        std::basic_string_view<CharT> option_name{};
+        /// Made union for clearer semantics.
         union {
             /// Only applicable when `type` is `variable` or `variable_option`.
-            std::size_t var_index{};
+            std::size_t var_index = 0;
             /// Only applicable when `type` is `end`.
             std::size_t usage_index;
         };
@@ -212,9 +212,10 @@ namespace cmd {
     /// Location of an error in a command.
     struct error_loc {
         /// Index of argument. -1: error cannot be pinpointed.
-        std::size_t arg_loc;
-        /// Index of character in the argument.
-        std::size_t in_arg_loc;
+        std::size_t arg_loc = -1;
+        /// Index of character in the argument. -1: subject is invalid
+        /// (e.g. when it is thrown as part of an `parser::argument_error`, it means the variable does not exist).
+        std::size_t in_arg_loc = -1;
     };
     /// A binding to `args`.
     /// It borrows if `Args` is an l-value reference, or takes ownership otherwise.
@@ -253,13 +254,15 @@ namespace cmd {
         using string_type = std::basic_string<char_type>;
         using string_view_type = std::basic_string_view<char_type>;
         using format_char_type = config_type::super_type::format_char_type;
+        using format_string_type = std::basic_string<format_char_type>;
+        using format_string_view_type = std::basic_string_view<format_char_type>;
         using hash_type = info_type::hash_type;
         using refs_type = std::vector<const typename config_type::super_type::usage_type*>;
         using usage_range_type = detail::usage_range<config.usage_tmpl>;
-        static constexpr bool input_enabled = input_object<char_type>::enabled;
-        static constexpr bool output_enabled = outputtable<char_type, format_char_type>;
-        static constexpr auto& input_stream = input_object<char_type>::value;
-        static constexpr auto& output_stream = output_object<format_char_type>::value;
+        static constexpr auto input_stream = input_object<char_type>::value;
+        static constexpr auto output_stream = output_object<format_char_type>::value;
+        static constexpr bool inputtable{input_stream};
+        static constexpr bool outputtable = std::formattable<format_string_type, format_char_type>;
         /// Despite its name, the struct only stores the `index` of a variable.
         /// This is because the `index` is computed at compile time from variable name.
         struct var_name {
@@ -291,11 +294,14 @@ namespace cmd {
             }
         };
     private:
-        static constexpr auto to_string = [](const auto& obj) noexcept {
-            return string_view_type{obj};
+        struct vars_element {
+            string_type content{};
+            error_loc loc{};
         };
-        std::array<std::pair<string_type, error_loc>, Info.var_names.size()> vars_{}; // starts from 1
+        /// \internal Index 0: variadic argument.\n Index 1 onwards: variables.
+        std::array<vars_element, Info.var_names.size()> vars_{};
         std::bitset<Info.flag_set.size()> flags_{};
+        std::vector<string_type> variadic_{};
     public:
         /// A wrapper for `error_ref` for `std::formatter`.
         /// \tparam Mode: 0 - prints the command (`ref`)\n
@@ -359,15 +365,14 @@ namespace cmd {
             constexpr parse_error(parse_error&&) noexcept = default;
 
             auto print(std::output_iterator<format_char_type> auto out) const
-            requires output_enabled {
+            requires outputtable {
                 return std::format_to(
                     out, config.error_tmpl, config.error_msgs[std::to_underlying(this->type)],
-                    ref, typename usage_range_type::type{this->refs}, string_view_type{}
-                );
+                    ref, typename usage_range_type::type{this->refs}, format_string_view_type{});
             }
             auto print() const
-            requires output_enabled {
-                return print(std::ostreambuf_iterator{output_stream});
+            requires (!!output_stream && outputtable) {
+                return print(std::ostreambuf_iterator{*output_stream});
             }
         };
         /// An error emitted by the developer for invalid arguments.
@@ -378,26 +383,25 @@ namespace cmd {
             using tag = error_tag;
             using super_type = parser;
             static constexpr error_type type = error_type::invalid_argument;
-            string_view_type what; /// Error message.
+            format_string_view_type what; /// Error message.
             error_ref<const Args&> ref;
             std::size_t usage_index;
 
             /// \param args: an `forward_range` of arguments that form the command
             /// \param loc: location of the error
             constexpr argument_error(
-                string_view_type what, const Args& args, error_loc loc, std::size_t usage_index) noexcept :
+                decltype(what) what, const Args& args, error_loc loc, std::size_t usage_index) noexcept :
                 what{what}, ref{args, loc}, usage_index{usage_index} {}
 
             auto print(std::output_iterator<format_char_type> auto out) const
-            requires output_enabled {
+            requires outputtable {
                 typename usage_range_type::type refs{std::array{&Info.usages[usage_index]}};
                 return std::format_to(
-                    out, config.error_tmpl, config.error_msgs[std::to_underlying(type)], ref, refs, what
-                );
+                    out, config.error_tmpl, config.error_msgs[std::to_underlying(type)], ref, refs, what);
             }
             auto print() const
-            requires output_enabled {
-                return print(std::ostreambuf_iterator{output_stream});
+            requires (!!output_stream && outputtable) {
+                return print(std::ostreambuf_iterator{*output_stream});
             }
         };
         /// Result of a successful `parse`,
@@ -469,7 +473,10 @@ namespace cmd {
         constexpr auto parse(Args&& args) noexcept {
             using enum parse_node_type;
             using enum error_type;
-            constexpr bool full_result = std::ranges::forward_range<Args>;
+            using args_type = std::remove_cvref_t<Args>;
+            using iter_type = ranges::iterator_t<args_type>;
+            using sentinel_type = ranges::sentinel_t<args_type>;
+            constexpr bool full_result = ranges::forward_range<Args>;
             using return_type = std::conditional_t<full_result,
                 std::expected<parse_result<Args>, parse_error<Args>>,
                 std::expected<part_parse_result, part_parse_error>>;
@@ -478,58 +485,83 @@ namespace cmd {
             auto arg_current = ranges::begin(args);
             auto arg_end = ranges::end(args);
             std::size_t arg_loc = 0;
-            auto next_arg = [&start_node, &node, &arg_current, &arg_loc](std::size_t next_node_idx) {
-                start_node = node = Info.tree.begin() + next_node_idx;
+            auto next_arg = [&arg_current, &arg_loc]() {
                 ++arg_current; ++arg_loc;
+            };
+            auto next_arg_node = [&start_node, &node, next_arg](std::size_t next_node_idx) {
+                start_node = node = Info.tree.begin() + next_node_idx;
+                next_arg();
             };
             auto raise = [&start_node, &args, &arg_loc](error_type err, std::size_t in_arg_loc = 0) {
                 refs_type refs = search_refs(start_node - Info.tree.begin());
                 if constexpr (full_result) {
-                    return return_type{std::unexpect, err, std::forward<Args>(args), error_loc{arg_loc, in_arg_loc}, refs};
+                    return return_type{std::unexpect,
+                        err, std::forward<Args>(args), error_loc{arg_loc, in_arg_loc}, refs};
                 } else {
                     return return_type{std::unexpect, err, refs};
                 }
             };
+            string_view_type arg;
             while (true) {
                 if (arg_current == arg_end) [[unlikely]] {
                     while (node->next_placeholder) {
                         node = Info.tree.begin() + node->next_placeholder;
                     }
-                    if (node->type != end) {
+                    if (node->type != variadic && node->type != end) {
                         return raise(too_few_arguments);
                     }
+                } else {
+                    arg = *arg_current;
                 }
+                parse_arg:
                 switch (node->type) {
                     case option:
-                    case variable_option:
-                        if (node->option_name == *arg_current) {
+                    case variable_option: {
+                        if (node->option_name == arg) {
                             if (node->type == variable_option) {
-                                vars_[node->var_index] = {string_type{*arg_current}, {arg_loc, 0}};
+                                vars_[node->var_index] = {string_type{arg}, {arg_loc, 0}};
                             }
-                            next_arg(node->next);
+                            next_arg_node(node->next);
                         } else if (node->next_placeholder) {
                             node = Info.tree.begin() + node->next_placeholder;
+                            if !consteval {goto parse_arg;}
                         } else [[unlikely]] {
                             return raise(unknown_option);
                         }
                         continue;
-                    case variable:
-                        if ((*arg_current).starts_with(config.specials.flag_prefix)) {
+                    }
+                    case variable: {
+                        if (arg.starts_with(config.specials.flag_prefix)) {
                             return raise(flag_cannot_be_variable);
                         }
-                        vars_[node->var_index] = {string_type{*arg_current}, {arg_loc, 0}};
-                        next_arg(node->next);
+                        vars_[node->var_index] = {string_type{arg}, {arg_loc, 0}};
+                        next_arg_node(node->next);
                         continue;
-                    case end:
+                    }
+                    case variadic: {
+                        if constexpr (std::sized_sentinel_for<iter_type, sentinel_type>) {
+                            variadic_.reserve(ranges::end(args) - arg_current);
+                        } else if constexpr (ranges::sized_range<args_type>) {
+                            variadic_.reserve(ranges::size(args));
+                        }
+                        for (; arg_current != arg_end; next_arg()) {
+                            arg = *arg_current;
+                            if (arg.starts_with(config.specials.flag_prefix)) break;
+                            variadic_.emplace_back(arg);
+                        }
                         break;
+                    }
+                    case end: {
+                        break;
+                    }
                 }
                 break;
             }
             for (;arg_current != arg_end; ++arg_current) {
-                std::basic_string_view<char_type> flag_str = *arg_current;
+                string_view_type flag_str = *arg_current;
                 if (flag_str.starts_with(config.specials.flag_prefix)) [[likely]] {
                     const std::size_t eq_pos = flag_str.find(config.specials.equal);
-                    std::basic_string_view<char_type> flag_name = flag_str.substr(0, eq_pos);
+                    string_view_type flag_name = flag_str.substr(0, eq_pos);
                     const std::size_t h = get_hash<hash_type, Info.flag_set.size()>(flag_name);
                     const auto& flag = Info.flag_set[h];
                     if (flag.name == flag_name && flag.defined_for[node->usage_index]) [[likely]] {
@@ -559,14 +591,36 @@ namespace cmd {
             }
         }
         /// \param argc: number of arguments
-        /// \param argv: array of arguments (in `char_type*`)
+        /// \param argv: array of arguments
         /// \return `std::expected<parse_result, parse_error>`
         /// \remark This method is meant to be called with `argc` and `argv`
         /// from the `main` function.
         /// As such, it expects the first argument in `argv` to be the path of the program,
         /// and therefore discarded.
-        constexpr auto parse(int argc, char_type* argv[]) noexcept {
-            return parse(views::counted(argv + 1, argc - 1) | views::transform(to_string));
+        constexpr auto parse(int argc, char* argv[]) noexcept
+        requires (std::same_as<char_type, char>) {
+            return parse(views::counted(argv + 1, argc - 1));
+        }
+        /// When `char_type` != `char`, `parse` does a conversion from `char_type` to `char`
+        /// using `std::codecvt` with the system locale.
+        constexpr auto parse(int argc, char* argv[])
+        requires (!std::same_as<char_type, char>) {
+            const auto& facet = std::use_facet<std::codecvt<char_type, char, std::mbstate_t>>(std::locale(""));
+            std::vector<string_type> args;
+            args.reserve(argc - 1);
+            for (std::string_view arg : views::counted(argv + 1, argc - 1)) {
+                args.emplace_back(arg.size(), char_type{0});
+                std::mbstate_t mb{};
+                const char* from_next;
+                char_type* to_next;
+                auto res = facet.in(mb, arg.data(), arg.data() + arg.size(), from_next,
+                    args.back().data(), args.back().data() + arg.size(), to_next);
+                if (res != std::codecvt_base::ok) {
+                    throw std::runtime_error("Unable to decode program arguments.");
+                }
+                args.back().resize(to_next - args.back().data());
+            }
+            return parse(std::move(args));
         }
         /// \param str: an `input_range` of `char_type` that forms a command string
         /// \return `std::expected<parse_result, parse_error>`
@@ -610,166 +664,131 @@ namespace cmd {
             }
             if (args.front().empty()) args.clear();
 
-            auto get_return = [this, &args]() {return parse(std::move(args) | views::transform(to_string));};
+            auto get_return = [this, &args]() {return parse(std::move(args));};
             using return_type = std::invoke_result_t<decltype(get_return)>;
             if (quote_open || escape) [[unlikely]] {
-                return return_type{std::unexpect, open_special_character, std::move(args) | views::transform(to_string)};
+                return return_type{std::unexpect, open_special_character, std::move(args)};
             }
             return get_return();
         }
         /// Reads and parses a line from standard input.
         /// \return `std::expected<parse_result, parse_error>`
         auto readline()
-        requires input_enabled {
+        requires inputtable {
             using iter_type = std::istreambuf_iterator<char_type>;
+            *input_stream >> std::ws;
             return parse(
-                std::ranges::subrange(iter_type(input_stream), iter_type())
-                | std::views::take_while([](char_type c) {
-                    if (c == input_stream.widen('\n')) {
-                        input_stream.ignore();
+                ranges::subrange(iter_type(*input_stream), iter_type())
+                | views::take_while([](char_type c) {
+                    const char_type eol = input_stream->widen('\n');
+                    if (c == eol) {
+                        input_stream->ignore(std::numeric_limits<std::streamsize>::max(), eol);
                         return false;
                     } else {
                         return true;
                     }
                 }));
         }
+        auto readline()
+        requires (!inputtable) {
+            std::string command;
+            std::getline(std::cin, command);
+            return parse(translator<char, char_type, true>{}(command));
+        }
         /// \param result: `parse_result` from `parse`
         /// \param name: name of the variable that causes the error
         /// \param what: error message
         template <typename Rng>
         constexpr argument_error<std::remove_reference_t<Rng>> raise_argument_error(
-            const parse_result<Rng>& result, var_name name, string_view_type what) const noexcept {
-            return {what, result.args, vars_[name.index].second, result.usage_index};
+            const parse_result<Rng>& result, var_name name, format_string_view_type what) const noexcept {
+            return {what, result.args, vars_[name.index].loc, result.usage_index};
         }
         /// Prints program manual to an `output_iterator` `out`.
         /// \param args: extra arguments for `config.man_tmpl`
-        void print_man(std::output_iterator<char_type> auto out, const auto&... args) const
-        requires output_enabled {
+        void print_man(std::output_iterator<format_char_type> auto out, const auto&... args) const
+        requires outputtable {
             std::format_to(
                 out, config.man_tmpl, config.name, config.description,
-                typename usage_range_type::type{std::views::iota(Info.usages.begin(), Info.usages.end())},
-                config.explanation, args...
-            );
+                typename usage_range_type::type{views::iota(Info.usages.begin(), Info.usages.end())},
+                config.explanation, args...);
         }
         /// Prints program manual to standard output.
         void print_man(const auto&... args) const
-        requires output_enabled {
-            print_man(std::ostreambuf_iterator{output_stream}, args...);
+        requires (!!output_stream && outputtable) {
+            print_man(std::ostreambuf_iterator{*output_stream}, args...);
         }
         /// \return value of variable named `name`
-        constexpr std::basic_string_view<char_type> var(var_name name) const noexcept {
-            return vars_[name.index].first;
+        constexpr string_view_type var(var_name name) const noexcept {
+            return vars_[name.index].content;
         }
         /// \return whether flag named `name` is set
         /// \remark The prefix of a flag has to be included in `name`.
         constexpr bool flag(flag_name name) const noexcept {
             return flags_[name.index];
         }
+        /// \return vector of variadic variables captured during `parse`
+        constexpr const std::vector<string_type>& variadic() const noexcept {
+            return variadic_;
+        }
         /// Clears values of all variables and sets all flags to `false`.
         constexpr void reset() noexcept {
             vars_.fill({});
             flags_.reset();
+            variadic_.clear();
         }
     };
-    constexpr std::size_t usage_parse_msg_max_size = 128;
-    template <auto& Config>
-    class usage_parse_error {
-    public:
-        using config_type = std::remove_cvref_t<decltype(Config)>;
-        using char_type = config_type::super_type::char_type;
-        using string_view_type = std::basic_string_view<char_type>;
-        static constexpr bool ref_enabled = std::is_same_v<char_type, char>;
-    private:
-        static constexpr std::string_view intro = "Parse error.\n \032 | \032\n \032 | \032\n\032";
-        static constexpr std::string_view ref_fallback = "Preview is not available if char_type is not char.";
-        static constexpr std::size_t ref_size = []() -> std::size_t {
-            if constexpr (ref_enabled) {
-                return ranges::max(Config.usages | views::transform([](const auto& usage) {
-                    return usage.format.size();
-                }));
-            } else {
-                return ref_fallback.size();
-            }
-        }();
-        static constexpr std::size_t num_max_size = sizeof(std::size_t) * CHAR_BIT / 3; // overestimation
-    public:
-        static constexpr std::size_t what_size =
-            intro.size() + (num_max_size + ref_size) * 2 + usage_parse_msg_max_size; // +'\0'
-    private:
-        std::array<char, what_size> _what{}; // null-terminated
-    public:
-        constexpr usage_parse_error(std::string_view msg, std::size_t usage_idx, std::size_t loc) noexcept {
-            auto sec_start = intro.begin(), sec_end = sec_start - 1;
-            char* current = _what.data();
-            auto copy_sec = [&sec_start, &sec_end, &current]() {
-                sec_start = sec_end + 1;
-                sec_end = ranges::find(sec_start, intro.end(), '\032');
-                current = ranges::copy(sec_start, sec_end, current).out;
-            };
-            copy_sec();
-            char* after_num = std::to_chars(current, &*_what.end(), usage_idx + 1).ptr;
-            std::size_t num_size = after_num - current;
-            current = after_num;
-            copy_sec();
-            if constexpr (ref_enabled) {
-                current = ranges::copy(Config.usages[usage_idx].format, current).out;
-            } else {
-                current = ranges::copy(ref_fallback, current).out;
-            }
-            copy_sec();
-            current = ranges::fill(current, current + num_size, ' ');
-            copy_sec();
-            current = ranges::fill(current, current + loc, ' ');
-            *(current++) = '^';
-            copy_sec();
-            ranges::copy(msg, current);
-        }
-        constexpr auto what() const noexcept {
-            return std::string_view{_what.data()};
-        }
-    };
+
     namespace detail {
-#define chk_err(msg)\
-static_assert(std::string_view{msg}.size() - 1 <= usage_parse_msg_max_size, "Error message is too long!")
         template <const auto& Config, typename CharT, typename Hash, std::size_t FlagSetSize>
         constexpr auto parse_usage(auto out) noexcept ->
-        std::expected<parser_def<std::remove_cvref_t<decltype(Config)>>, usage_parse_error<Config>> {
-#if __cpp_static_assert >= 202306L
-#define RRAISE(msg, ...)\
-return std::unexpected{usage_parse_error<Config>{\
-    msg, static_cast<size_t>(i), static_cast<size_t>(t.data() - usage.format.data() __VA_OPT__(+) __VA_ARGS__)\
-}}
-#define RAISE(msg, ...)\
-chk_err(msg);\
-RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
-#else
-#define rraise throw
-#define raise throw
-#endif
+        std::expected<parser_def<std::remove_cvref_t<decltype(Config)>>, define_error> {
             using string_view_type = std::basic_string_view<CharT>;
             using enum parse_node_type;
+            using enum define_error_ref_type;
             std::vector<parse_node<CharT>> tree;
             std::vector<string_view_type> var_names{{}};
             std::array<flag_info<ranges::size(Config.usages), CharT>, FlagSetSize> flag_set;
+            auto add_var = [&var_names] (string_view_type name) -> std::size_t {
+                auto search = ranges::find(var_names, name);
+                if (search == var_names.end()) {
+                    var_names.push_back(name);
+                    return var_names.size() - 1;
+                } else {
+                    return search - var_names.begin();
+                }
+            };
             for (auto [i, usage] : Config.usages | views::enumerate) {
+                bool searching = !tree.empty();
+                bool ended = false;
+                parse_node_type end_type = end;
+                // current node in traversal, final value is first unmatched node
+                std::size_t current = 0;
+                string_view_type t = usage.format;
+                std::bitset<FlagSetSize> usage_flag_set;
+                auto get_error = [&i, &t, &usage](std::string_view what, std::size_t offset = 0) -> define_error_ref {
+                    return {what, i, t.data() - usage.format.data() + offset};
+                };
+                auto raise = [get_error](std::string_view what, std::size_t offset = 0) {
+                    return std::unexpected(define_error{Config, std::array{get_error(what, offset)}});
+                };
+                /// \param exclude: needs to be sorted
                 auto add_option =
-                [&tree, &i, &usage] [[nodiscard]]
-                (string_view_type t, parse_node_type type = option, std::size_t var_index = 0,
-                    std::span<string_view_type> exclude = {}) ->
-                std::optional<std::unexpected<usage_parse_error<Config>>> {
+                [&tree, &t, raise] [[nodiscard]]
+                (parse_node_type type = option, std::size_t var_index = 0, std::span<string_view_type> exclude = {})
+                -> std::optional<std::unexpected<define_error>> {
                     bool compound = t.starts_with(Config.specials.compound_open);
                     if (compound) {
                         if (t.ends_with(Config.specials.compound_close)) [[likely]] {
                             t.remove_prefix(Config.specials.compound_open.size());
                             t.remove_suffix(Config.specials.compound_close.size());
                         } else {
-                            RAISE("Unmatched '(' when declaring a compound option.");
+                            return raise("Unmatched '(' when declaring a compound option.");
                         }
                     }
                     std::size_t start_node_index = tree.size();
                     auto rng = t | views::split(Config.specials.compound_divider);
                     if (rng.empty()) [[unlikely]] {
-                        RAISE("Option lists cannot be empty.");
+                        return raise("Option lists cannot be empty.");
                     }
                     auto it = rng.begin();
                     if (compound) {
@@ -784,7 +803,7 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                                     });
                                     return std::nullopt;
                                 } else {
-                                    RAISE(
+                                    return raise(
                                         R"(Using a capture ("...") without specifying the capturing variable.)",
                                         t.size());
                                 }
@@ -792,7 +811,7 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                         }
                     } else {
                         if (ranges::advance(it, 2, rng.end()) == 0) [[unlikely]] {
-                            RAISE(
+                            return raise(
                                 "Using | in a non-compound option declaration. "
                                 "If you want to declare a compound option, enclose it with ().",
                                 t.find(Config.specials.compound_divider));
@@ -801,19 +820,17 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                     for (const auto& opt : rng) {
                         string_view_type opt_t{opt};
                         if (opt_t.empty()) [[unlikely]] {
-                            RAISE(
+                            return raise(
                                 "Options cannot be empty. Check if you have added a redundant delimiter ('|').",
-                                opt.data() - t.data()
-                            );
+                                opt.data() - t.data());
                         }
                         if (opt_t == Config.specials.var_capture) [[unlikely]] {
-                            RAISE(
-                                R"(A capture ("...") must be placed as the last option.)",
-                                opt.data() - t.data()
-                            );
+                            return raise(
+                                R"(A capture ("...") must be placed as the last option.)", opt.data() - t.data());
                         }
-                        if (std::ranges::contains(exclude, opt_t)) [[unlikely]] {
-                            RAISE("Variable option is already an option at this position.", opt.data() - t.data());
+                        if (ranges::binary_search(exclude, opt_t)) [[unlikely]] {
+                            return raise(
+                                "Variable option repeats an existing option in this position.", opt.data() - t.data());
                         }
                         tree.push_back({.type = type, .option_name = string_view_type{opt}, .var_index = var_index});
                         tree.back().next_placeholder = tree.size();
@@ -824,42 +841,49 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                     }
                     return std::nullopt;
                 };
-                auto add_var = [&var_names] (string_view_type name) -> std::size_t {
-                    auto search = ranges::find(var_names, name);
-                    if (search == var_names.end()) {
-                        var_names.push_back(name);
-                        return var_names.size() - 1;
-                    } else {
-                        return search - var_names.begin();
-                    }
+                // call after pushing
+                auto insert_before_end = [&tree, &current](std::size_t added_first) {
+                    tree.back().next_placeholder = added_first;
+                    tree[current].next = tree.size();
+                    std::swap(tree[current], tree[added_first]);
                 };
-                bool searching = !tree.empty();
-                bool ended = false;
-                std::size_t current = 0, prev; // current: final value is first unmatched node
-                string_view_type t = usage.format;
-                std::bitset<FlagSetSize> usage_flag_set;
                 for (const auto& token : usage.format | views::split(Config.specials.delimiter)) {
                     t = string_view_type{token};
                     if (t.empty()) [[unlikely]] {
-                        RAISE("Options cannot be empty. Check if you have added a redundant delimiter (' ').");
+                        return raise("Options cannot be empty. Check if you have added a redundant delimiter (' ').");
                     }
                     if (t.starts_with(Config.specials.flag_open)) {
                         if (t.ends_with(Config.specials.flag_close)) [[likely]] {
                             t.remove_prefix(Config.specials.flag_open.size());
                             t.remove_suffix(Config.specials.flag_close.size());
                             if (!t.starts_with('-')) [[unlikely]] {
-                                RAISE("Flags must be enclosed with a single pair of '[' and ']' and start with '-'.");
+                                return raise(
+                                    "Flags must be enclosed with a single pair of '[' and ']' and start with '-'.");
                             }
                             std::size_t eq_pos = t.find(Config.specials.equal);
                             string_view_type flag_name = t.substr(0, eq_pos);
                             std::size_t h = get_hash<Hash, FlagSetSize>(flag_name);
                             auto& flag = flag_set[h];
                             if (flag.defined()) {
+                                std::string_view what;
                                 if (flag.name != flag_name) [[unlikely]] {
-                                    RAISE("Hash collision when declaring flag.");
+                                    what = "Hash collision when declaring flag.";
+                                } else if (usage_flag_set[h]) [[unlikely]] {
+                                    what = "Re-declaring flag.";
                                 }
-                                if (usage_flag_set[h]) [[unlikely]] {
-                                    RAISE("Re-declaring flag.");
+                                if (what.data()) {
+                                    std::array<define_error_ref, 2> refs{get_error(what), {
+                                        .what = "Previous flag defined here.",
+                                        .usage_index = 0,
+                                        .type = note
+                                    }};
+                                    for (std::size_t& j = refs[1].usage_index; j < ranges::size(Config.usages); ++j) {
+                                        if (flag.defined_for[j]) {
+                                            refs[1].loc = flag.name.data() - Config.usages[j].format.data();
+                                            break;
+                                        }
+                                    }
+                                    return std::unexpected(define_error{Config, refs});
                                 }
                             } else {
                                 flag.name = flag_name;
@@ -875,31 +899,31 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                                     var_name.remove_prefix(1); var_name.remove_suffix(1);
                                     flag.var_index_for[i] = add_var(var_name);
                                 } else {
-                                    RAISE("A variable declaration must be enclosed with a pair of '<' and '>'.");
+                                    return raise("A variable declaration must be enclosed with a pair of '<' and '>'.");
                                 }
                             }
                         } else {
-                            RAISE("Unclosed '[' when declaring flag.");
+                            return raise("Unclosed '[' when declaring flag.");
                         }
                         ended = true;
                         continue;
                     }
                     if (ended) [[unlikely]] {
-                        RAISE("Declaring non-flag attributes after declaring the first flag.");
+                        return raise("Declaring non-flag attributes after declaring the first flag.");
                     }
                     if (t.starts_with(Config.specials.var_open)) {
                         std::size_t var_start = Config.specials.var_open.size(),
                         var_end = t.find(Config.specials.var_close, var_start);
                         if (var_end == t.npos) [[unlikely]] {
-                            RAISE("Unclosed < when declaring variable.");
+                            return raise("Unclosed < when declaring variable.");
                         }
-                        std::size_t var_index = add_var(t.substr(var_start, var_end - var_start));
+                        const std::size_t var_index = add_var(t.substr(var_start, var_end - var_start));
                         var_end += Config.specials.var_close.size();
-                        parse_node_type type = (var_end == t.size()) ? variable : variable_option;
-                        std::size_t next_placeholder = 0;
+                        const parse_node_type type = (var_end == t.size()) ? variable : variable_option;
                         std::vector<string_view_type> prev_opts;
-                        if (!tree.empty() && searching) {
-                            while (tree[current].type == option) {
+                        bool insert = false;
+                        if (searching) {
+                            while (tree[current].type == option || tree[current].type == variable_option) {
                                 if (type == variable_option) {
                                     prev_opts.emplace_back(tree[current].option_name);
                                 }
@@ -911,77 +935,98 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                             }
                             switch (tree[current].type) {
                                 case option:
+                                case variable_option: {
                                     tree[current].next_placeholder = tree.size();
                                     break;
-                                case variable:
-                                case variable_option:
-                                    RAISE("Attempt to declare two variables on the same position.");
-                                case end:
-                                    tree[prev].next = tree.size();
-                                    next_placeholder = current;
-                                    current = tree.size();
+                                }
+                                case variable: {
+                                    string_view_type var_name = var_names[tree[current].var_index];
+                                    while (tree[current].next) {
+                                        current = tree[current].next;
+                                        while (tree[current].next_placeholder) {
+                                            current = tree[current].next_placeholder;
+                                        }
+                                    }
+                                    std::size_t usage_index = tree[current].usage_index;
+                                    std::array<define_error_ref, 2> refs = {
+                                        get_error("Attempt to declare two variables on the same position."),
+                                        {
+                                            .what = "Previous variable declared here.",
+                                            .usage_index = usage_index,
+                                            .loc = var_name.data() - Config.usages[usage_index].format.data(),
+                                            .type = note
+                                        }
+                                    };
+                                    return std::unexpected(define_error{Config, refs});
+                                }
+                                case variadic:
+                                case end: {
+                                    insert = true;
                                     break;
+                                }
                             }
                         }
+                        const std::size_t added_first = tree.size();
                         if (type == variable) {
                             tree.push_back({
                                 .type = variable,
                                 .var_index = var_index,
-                                .next_placeholder = next_placeholder,
                                 .next = tree.size() + 1
                             });
                         } else {
                             t.remove_prefix(var_end);
                             if (!t.starts_with(Config.specials.equal)) [[unlikely]] {
-                                RAISE("Unexpected character after declaration of variable.");
+                                return raise("Unexpected character after declaration of variable.");
                             }
                             t.remove_prefix(Config.specials.equal.size());
                             if (!t.starts_with(Config.specials.compound_open)) [[unlikely]] {
-                                RAISE("Expected '(' for declaration of a variable option.");
+                                return raise("Expected '(' for declaration of a variable option.");
                             }
-                            if (auto res = add_option(t, variable_option, var_index, prev_opts)) [[unlikely]] {
+                            ranges::sort(prev_opts);
+                            if (auto res = add_option(variable_option, var_index, prev_opts)) [[unlikely]] {
                                 return *res;
                             }
-                            tree.back().next_placeholder = next_placeholder;
                         }
+                        if (insert) insert_before_end(added_first);
                         searching = false;
+                    } else if (t == Config.specials.variadic) {
+                        end_type = variadic;
+                        searching = false;
+                        break;
                     } else {
-                        if (!tree.empty() && searching) {
+                        if (searching) {
                             while (true) {
                                 switch (tree[current].type) {
                                     case option:
-                                    case variable_option:
+                                    case variable_option: {
                                         if (tree[current].option_name == t) {
-                                            prev = current;
                                             current = tree[current].next;
                                         } else if (tree[current].next_placeholder) {
                                             current = tree[current].next_placeholder;
                                             continue;
                                         } else {
                                             tree[current].next_placeholder = tree.size();
-                                            if (auto res = add_option(t)) return *res;
+                                            if (auto res = add_option()) return *res;
                                             searching = false;
                                         }
                                         break;
+                                    }
                                     case variable:
-                                        RAISE("Declaring new option after a variable has been declared at the position.");
-                                    case end:
-                                        tree[prev].next = tree.size();
-                                        if (auto res = add_option(t)) return *res;
-                                        tree.back().next_placeholder = current;
-                                        tree[current].next = tree.size();
+                                    case variadic:
+                                    case end: {
+                                        const std::size_t added_first = tree.size();
+                                        if (auto res = add_option()) return *res;
+                                        insert_before_end(added_first);
                                         searching = false;
                                         break;
+                                    }
                                 }
                                 break;
                             }
                         } else {
-                            if (auto res = add_option(t)) return *res;
+                            if (auto res = add_option()) return *res;
                         }
                     }
-                }
-                if (!tree.empty() && tree[current].type == end) [[unlikely]] {
-                    RAISE("Duplicate usage.");
                 }
                 if (searching) {
                     while (tree[current].next_placeholder) {
@@ -989,8 +1034,29 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                     }
                     tree[current].next_placeholder = tree.size();
                 }
-                tree.push_back({.type = end, .usage_index = static_cast<size_t>(i)});
-#undef RRAISE
+                if (!tree.empty()) [[likely]] {
+                    parse_node_type type = tree[current].type;
+                    std::string_view what;
+                    std::size_t offset = 0;
+                    if (type == variadic) [[unlikely]] {
+                        what = "Another usage takes variadic arguments in this position.";
+                        offset = -Config.specials.variadic.size();
+                    }
+                    if (type == end) [[unlikely]] {
+                        what = "Another usage ends in this position.";
+                    }
+                    if (what.data()) {
+                        std::size_t usage_index = tree[current].usage_index;
+                        std::array<define_error_ref, 2> refs = {get_error(what, t.size() + offset), {
+                            .what = "Previously defined here.",
+                            .usage_index = usage_index,
+                            .loc = Config.usages[usage_index].format.size() + offset,
+                            .type = note
+                        }};
+                        return std::unexpected(define_error{Config, refs});
+                    }
+                }
+                tree.push_back({.type = end_type, .usage_index = static_cast<std::size_t>(i)});
 #undef RAISE
             }
             if constexpr (!std::is_same_v<decltype(out), std::nullptr_t>) {
@@ -1008,7 +1074,6 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
                 .config = Config
             };
         }
-#undef chk_err
     }
     template <config_instance auto& Config>
     using config_type_of = std::remove_cvref_t<decltype(Config)>::super_type;
@@ -1035,7 +1100,7 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
             return info;
         } else {
 #if __cpp_static_assert >= 202306L
-            static_assert(false, res.error().what());
+            static_assert(false, res.error());
 #endif
         }
     }
@@ -1043,13 +1108,15 @@ RRAISE(msg __VA_OPT__(,) __VA_ARGS__)
 
 template <cmd::tagged<cmd::detail::usage_range_tag> Rng>
 struct std::formatter<Rng, typename Rng::format_char_type> {
+    using char_type = Rng::char_type;
+    using format_char_type = Rng::format_char_type;
     constexpr auto parse(auto& ctx) {
         return ctx.begin();
     }
     constexpr auto format(const Rng& rng, auto& ctx) const {
         auto out = ctx.out();
         for (const auto usage : rng.value) {
-            out = std::format_to(out, Rng::format, usage->format);
+            out = std::format_to(out, Rng::format, cmd::translator<char_type, format_char_type>{}(usage->format));
         }
         return out;
     }
@@ -1085,6 +1152,9 @@ struct std::formatter<Ref, typename Ref::super_type::format_char_type> {
 template <cmd::tagged<cmd::error_ref_c_tag> RefC>
 struct std::formatter<RefC, typename RefC::super_type::format_char_type> {
     using parser_type = RefC::super_type;
+    using char_type = parser_type::char_type;
+    using format_char_type = parser_type::format_char_type;
+    using string_view_type = parser_type::string_view_type;
     constexpr auto parse(auto& ctx) {
         return ctx.begin();
     }
@@ -1094,14 +1164,14 @@ struct std::formatter<RefC, typename RefC::super_type::format_char_type> {
         constexpr const auto& specials = parser_type::config.specials;
         bool first = true, indicated = false;
         std::size_t i = 0;
-        for (auto arg : ref.args) {
+        for (string_view_type arg : ref.args) {
             if (first) {
                 first = false;
             } else {
                 *(out++) = specials.delimiter;
             }
             if constexpr (RefC::mode == 0) {
-                out = ranges::copy(arg, out).out;
+                out = ranges::copy(cmd::translator<char_type, format_char_type>{}(arg), out).out;
             } else if constexpr (RefC::mode == 1) {
                 for (std::size_t j = 0; j < arg.size(); ++j) {
                     if ((i == ref.loc.arg_loc) && (j == ref.loc.in_arg_loc)) [[unlikely]] {

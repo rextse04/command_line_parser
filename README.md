@@ -75,7 +75,7 @@ Closest usages:
 ```
 
 Finally, to parse another command, call ```parser.reset()```,
-otherwise variables and flags from the previous parse will be retained.
+otherwise the behavior is implementation-defined.
 
 ## Documentation
 [Here](https://rextse04.github.io/command_line_parser/).
