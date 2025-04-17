@@ -14,6 +14,12 @@ var annotated_dup =
       [ "flag_info", "structcmd_1_1flag__info.html", "structcmd_1_1flag__info" ],
       [ "hash", "structcmd_1_1hash.html", null ],
       [ "hash< T >", "structcmd_1_1hash_3_01T_01_4.html", "structcmd_1_1hash_3_01T_01_4" ],
+      [ "input_object", "structcmd_1_1input__object.html", "structcmd_1_1input__object" ],
+      [ "input_object< char >", "structcmd_1_1input__object_3_01char_01_4.html", "structcmd_1_1input__object_3_01char_01_4" ],
+      [ "input_object< wchar_t >", "structcmd_1_1input__object_3_01wchar__t_01_4.html", "structcmd_1_1input__object_3_01wchar__t_01_4" ],
+      [ "output_object", "structcmd_1_1output__object.html", "structcmd_1_1output__object" ],
+      [ "output_object< char >", "structcmd_1_1output__object_3_01char_01_4.html", "structcmd_1_1output__object_3_01char_01_4" ],
+      [ "output_object< wchar_t >", "structcmd_1_1output__object_3_01wchar__t_01_4.html", "structcmd_1_1output__object_3_01wchar__t_01_4" ],
       [ "parse_node", "structcmd_1_1parse__node.html", "structcmd_1_1parse__node" ],
       [ "parser", "classcmd_1_1parser.html", "classcmd_1_1parser" ],
       [ "parser_def", "structcmd_1_1parser__def.html", "structcmd_1_1parser__def" ],
@@ -21,6 +27,8 @@ var annotated_dup =
       [ "receiver", "structcmd_1_1receiver.html", "structcmd_1_1receiver" ],
       [ "receiver< Args & >", "structcmd_1_1receiver_3_01Args_01_6_01_4.html", "structcmd_1_1receiver_3_01Args_01_6_01_4" ],
       [ "special_chars", "structcmd_1_1special__chars.html", "structcmd_1_1special__chars" ],
+      [ "translator", "structcmd_1_1translator.html", "structcmd_1_1translator" ],
+      [ "translator< CharT, CharT, reverse >", "structcmd_1_1translator_3_01CharT_00_01CharT_00_01reverse_01_4.html", "structcmd_1_1translator_3_01CharT_00_01CharT_00_01reverse_01_4" ],
       [ "usage", "structcmd_1_1usage.html", "structcmd_1_1usage" ]
     ] ],
     [ "std", null, [
