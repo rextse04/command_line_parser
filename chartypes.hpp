@@ -11,8 +11,8 @@ namespace cmd {
         requires std::equality_comparable<CharT>;
     };
 
-    /// If a specialization of \code output_object\endcode sets \code enabled\endcode to \code true\endcode,
-    /// it must supply a (global) \code std::basic_ostream<CharT>\endcode for a \code parser\endcode to write to.
+    /// If a specialization of `output_object` sets `enabled` to `true`,
+    /// it must supply a (global) `std::basic_ostream<CharT>` for a `parser` to write to.
     template <char_like>
     struct output_object {
         static constexpr auto value = nullptr;
@@ -26,8 +26,8 @@ namespace cmd {
         static constexpr auto value = &std::wcout;
     };
 
-    /// If a specialization of \code input_object\endcode sets \code enabled\endcode to \code false\endcode,
-    /// it must supply a (global) \code std::basic_istream<CharT>\endcode for a \code parser\endcode to read from.
+    /// If a specialization of `input_object` sets `enabled` to `false`,
+    /// it must supply a (global) `std::basic_istream<CharT>` for a `parser` to read from.
     template <char_like>
     struct input_object {
         static constexpr auto value = nullptr;
