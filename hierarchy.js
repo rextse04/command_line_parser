@@ -3,6 +3,8 @@ var hierarchy =
     [ "cmd::parser< Info >::argument_error< Args >", "structcmd_1_1parser_1_1argument__error.html", null ],
     [ "cmd::config< Result, CharT, FmtCharT >", "structcmd_1_1config.html", null ],
     [ "cmd::config_default< CharT, FmtCharT >", "structcmd_1_1config__default.html", null ],
+    [ "cmd::detail::define_error", "structcmd_1_1detail_1_1define__error.html", null ],
+    [ "cmd::detail::define_error_ref", "structcmd_1_1detail_1_1define__error__ref.html", null ],
     [ "cmd::error_loc", "structcmd_1_1error__loc.html", null ],
     [ "cmd::parser< Info >::error_ref_wrapper< Mode >", "structcmd_1_1parser_1_1error__ref__wrapper.html", null ],
     [ "cmd::flag_info< UsageSize, CharT >", "structcmd_1_1flag__info.html", null ],
@@ -34,7 +36,6 @@ var hierarchy =
     [ "cmd::parser< Info >::error_ref_wrapper< Mode >::type< Ref >", "structcmd_1_1parser_1_1error__ref__wrapper_1_1type.html", null ],
     [ "cmd::usage< Result, CharT >", "structcmd_1_1usage.html", null ],
     [ "cmd::usage< result_type, char_type >", "structcmd_1_1usage.html", null ],
-    [ "cmd::usage_parse_error< Config >", "classcmd_1_1usage__parse__error.html", null ],
     [ "cmd::detail::usage_range< FormatString >", "structcmd_1_1detail_1_1usage__range.html", null ],
     [ "cmd::parser< Info >::var_name", "structcmd_1_1parser_1_1var__name.html", null ]
 ];

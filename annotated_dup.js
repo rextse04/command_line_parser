@@ -2,6 +2,8 @@ var annotated_dup =
 [
     [ "cmd", "namespacecmd.html", [
       [ "detail", "namespacecmd_1_1detail.html", [
+        [ "define_error", "structcmd_1_1detail_1_1define__error.html", "structcmd_1_1detail_1_1define__error" ],
+        [ "define_error_ref", "structcmd_1_1detail_1_1define__error__ref.html", "structcmd_1_1detail_1_1define__error__ref" ],
         [ "usage_range", "structcmd_1_1detail_1_1usage__range.html", [
           [ "type", "structcmd_1_1detail_1_1usage__range_1_1type.html", "structcmd_1_1detail_1_1usage__range_1_1type" ]
         ] ]
@@ -19,8 +21,7 @@ var annotated_dup =
       [ "receiver", "structcmd_1_1receiver.html", "structcmd_1_1receiver" ],
       [ "receiver< Args & >", "structcmd_1_1receiver_3_01Args_01_6_01_4.html", "structcmd_1_1receiver_3_01Args_01_6_01_4" ],
       [ "special_chars", "structcmd_1_1special__chars.html", "structcmd_1_1special__chars" ],
-      [ "usage", "structcmd_1_1usage.html", "structcmd_1_1usage" ],
-      [ "usage_parse_error", "classcmd_1_1usage__parse__error.html", "classcmd_1_1usage__parse__error" ]
+      [ "usage", "structcmd_1_1usage.html", "structcmd_1_1usage" ]
     ] ],
     [ "std", null, [
       [ "formatter< Error, typename Error::super_type::format_char_type >", "structstd_1_1formatter_3_01Error_00_01typename_01Error_1_1super__type_1_1format__char__type_01_4.html", "structstd_1_1formatter_3_01Error_00_01typename_01Error_1_1super__type_1_1format__char__type_01_4" ],

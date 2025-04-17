@@ -97,17 +97,18 @@ $(document).ready(function(){initNavTree('structcmd_1_1parse__node.html',''); in
 Public Attributes</h2></td></tr>
 <tr class="memitem:a005c7f9ac8db56b475a38a9243dc2ec0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1">parse_node_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1parse__node.html#a005c7f9ac8db56b475a38a9243dc2ec0">type</a></td></tr>
 <tr class="separator:a005c7f9ac8db56b475a38a9243dc2ec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6f7ee4285821845c18af45f87b2b444"><td class="memItemLeft" align="right" valign="top">std::basic_string_view&lt; CharT &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1parse__node.html#ae6f7ee4285821845c18af45f87b2b444">option_name</a></td></tr>
+<tr class="memitem:ae6f7ee4285821845c18af45f87b2b444"><td class="memItemLeft" align="right" valign="top">std::basic_string_view&lt; CharT &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1parse__node.html#ae6f7ee4285821845c18af45f87b2b444">option_name</a> {}</td></tr>
 <tr class="memdesc:ae6f7ee4285821845c18af45f87b2b444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Only applicable when <code>type</code> is <code>option</code> or <code>variable_option</code>.  <a href="structcmd_1_1parse__node.html#ae6f7ee4285821845c18af45f87b2b444">More...</a><br /></td></tr>
 <tr class="separator:ae6f7ee4285821845c18af45f87b2b444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49bef1963cdf1d6feb66a734f1042e7b"><td class="memItemLeft" >union {</td></tr>
-<tr class="memitem:a0fed9292522d0652d75a5d19ffeb4a5e"><td class="memItemLeft" >&#160;&#160;&#160;std::size_t&#160;&#160;&#160;<a class="el" href="structcmd_1_1parse__node.html#ae47bcaa1e02b0ae81637d56681f2bde6">var_index</a> {}</td></tr>
+<tr class="memitem:a0fed9292522d0652d75a5d19ffeb4a5e"><td class="memItemLeft" >&#160;&#160;&#160;std::size_t&#160;&#160;&#160;<a class="el" href="structcmd_1_1parse__node.html#ae47bcaa1e02b0ae81637d56681f2bde6">var_index</a> = 0</td></tr>
 <tr class="memdesc:a0fed9292522d0652d75a5d19ffeb4a5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Only applicable when <code>type</code> is <code>variable</code> or <code>variable_option</code>.  <a href="unioncmd_1_1parse__node_1_1_0d0.html#a0fed9292522d0652d75a5d19ffeb4a5e">More...</a><br /></td></tr>
 <tr class="separator:a0fed9292522d0652d75a5d19ffeb4a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0baba833046ffe15049a3e8dbc11122"><td class="memItemLeft" >&#160;&#160;&#160;std::size_t&#160;&#160;&#160;<a class="el" href="structcmd_1_1parse__node.html#aafd368c317dde63c797e39630c1c8750">usage_index</a></td></tr>
 <tr class="memdesc:ab0baba833046ffe15049a3e8dbc11122"><td class="mdescLeft">&#160;</td><td class="mdescRight">Only applicable when <code>type</code> is <code>end</code>.  <a href="unioncmd_1_1parse__node_1_1_0d0.html#ab0baba833046ffe15049a3e8dbc11122">More...</a><br /></td></tr>
 <tr class="separator:ab0baba833046ffe15049a3e8dbc11122"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49bef1963cdf1d6feb66a734f1042e7b"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="memdesc:a49bef1963cdf1d6feb66a734f1042e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Made union for clearer semantics.  <a href="structcmd_1_1parse__node.html#a49bef1963cdf1d6feb66a734f1042e7b">More...</a><br /></td></tr>
 <tr class="separator:a49bef1963cdf1d6feb66a734f1042e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8447bb32b229fdcfc60845936c66cacf"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1parse__node.html#a8447bb32b229fdcfc60845936c66cacf">next_placeholder</a> = 0</td></tr>
 <tr class="memdesc:a8447bb32b229fdcfc60845936c66cacf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of the next node in the same position. A value of 0 means there is no such node.  <a href="structcmd_1_1parse__node.html#a8447bb32b229fdcfc60845936c66cacf">More...</a><br /></td></tr>
@@ -138,6 +139,8 @@ struct cmd::parse_node&lt; CharT &gt;</div><p >A node in a parse tree. </p><dl c
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Made union for clearer semantics. </p>
 
 </div>
 </div>
@@ -190,7 +193,7 @@ template&lt;char_like CharT&gt; </div>
 template&lt;char_like CharT&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::basic_string_view&lt;CharT&gt; <a class="el" href="structcmd_1_1parse__node.html">cmd::parse_node</a>&lt; CharT &gt;::option_name</td>
+          <td class="memname">std::basic_string_view&lt;CharT&gt; <a class="el" href="structcmd_1_1parse__node.html">cmd::parse_node</a>&lt; CharT &gt;::option_name {}</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -248,7 +251,7 @@ template&lt;char_like CharT&gt; </div>
 template&lt;char_like CharT&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::size_t <a class="el" href="structcmd_1_1parse__node.html">cmd::parse_node</a>&lt; CharT &gt;::var_index {}</td>
+          <td class="memname">std::size_t <a class="el" href="structcmd_1_1parse__node.html">cmd::parse_node</a>&lt; CharT &gt;::var_index = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">

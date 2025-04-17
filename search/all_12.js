@@ -1,7 +1,7 @@
 var searchData=
 [
   ['value_0',['value',['../structcmd_1_1detail_1_1usage__range_1_1type.html#a54c54c1621b5aaea1c942981352ffa66',1,'cmd::detail::usage_range::type']]],
-  ['var_1',['var',['../classcmd_1_1parser.html#a1c631c3ecd1c868aad50fbcba17ff162',1,'cmd::parser']]],
+  ['var_1',['var',['../classcmd_1_1parser.html#a119ffbc6c2a839b0c4a9844c6f82d91c',1,'cmd::parser']]],
   ['var_5fcapture_2',['var_capture',['../structcmd_1_1special__chars.html#a32799a95940096e508fc3c3071f8bae7',1,'cmd::special_chars']]],
   ['var_5fclose_3',['var_close',['../structcmd_1_1special__chars.html#ac5d378d6e1e419aa76ee35e3bf3af017',1,'cmd::special_chars']]],
   ['var_5findex_4',['var_index',['../structcmd_1_1parse__node.html#ae47bcaa1e02b0ae81637d56681f2bde6',1,'cmd::parse_node']]],
@@ -12,5 +12,6 @@ var searchData=
   ['var_5fopen_9',['var_open',['../structcmd_1_1special__chars.html#a3bcaa6aee1a4c420b3783e4c375d0d63',1,'cmd::special_chars']]],
   ['variable_10',['variable',['../namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26',1,'cmd']]],
   ['variable_5foption_11',['variable_option',['../namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2',1,'cmd']]],
-  ['vars_5fsize_12',['vars_size',['../structcmd_1_1parser__def.html#ae0d1f4810b4f69678a057047a1723ea4',1,'cmd::parser_def']]]
+  ['variadic_12',['variadic',['../structcmd_1_1special__chars.html#a935bc15a3659289c27522421f1deac2d',1,'cmd::special_chars::variadic()'],['../classcmd_1_1parser.html#a5c2e8bbe6894524565dc98608acd1563',1,'cmd::parser::variadic()'],['../namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ad87cd2579681533b664d4d82b7ad31d9',1,'cmd::variadic()']]],
+  ['vars_5fsize_13',['vars_size',['../structcmd_1_1parser__def.html#ae0d1f4810b4f69678a057047a1723ea4',1,'cmd::parser_def']]]
 ];

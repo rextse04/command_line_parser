@@ -15,5 +15,6 @@ var structcmd_1_1special__chars =
     [ "quote_open", "structcmd_1_1special__chars.html#a6cc681946fecedabc4efff2996e46e3b", null ],
     [ "var_capture", "structcmd_1_1special__chars.html#a32799a95940096e508fc3c3071f8bae7", null ],
     [ "var_close", "structcmd_1_1special__chars.html#ac5d378d6e1e419aa76ee35e3bf3af017", null ],
-    [ "var_open", "structcmd_1_1special__chars.html#a3bcaa6aee1a4c420b3783e4c375d0d63", null ]
+    [ "var_open", "structcmd_1_1special__chars.html#a3bcaa6aee1a4c420b3783e4c375d0d63", null ],
+    [ "variadic", "structcmd_1_1special__chars.html#a935bc15a3659289c27522421f1deac2d", null ]
 ];

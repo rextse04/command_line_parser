@@ -86,7 +86,9 @@ $(document).ready(function(){initNavTree('namespacecmd_1_1detail.html',''); init
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">cmd::detail Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -96,20 +98,71 @@ $(document).ready(function(){initNavTree('namespacecmd_1_1detail.html',''); init
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1detail_1_1define__error.html">define_error</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1detail_1_1define__error__ref.html">define_error_ref</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1detail_1_1usage__range.html">usage_range</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ab7827f1157ccb07918f9264d0dc21ede"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#ab7827f1157ccb07918f9264d0dc21ede">define_error_ref_type</a> { <a class="el" href="namespacecmd_1_1detail.html#ab7827f1157ccb07918f9264d0dc21edeacb5e100e5a9a3e7f6d1fd97512215282">error</a>
+, <a class="el" href="namespacecmd_1_1detail.html#ab7827f1157ccb07918f9264d0dc21edea7b83d3f08fa392b79e3f553b585971cd">warning</a>
+, <a class="el" href="namespacecmd_1_1detail.html#ab7827f1157ccb07918f9264d0dc21edeaaad653ca3ee669635f2938b73098b6d7">note</a>
+ }</td></tr>
+<tr class="separator:ab7827f1157ccb07918f9264d0dc21ede"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad984186aaf0b3752d4ba6bb7dca63e2d"><td class="memTemplParams" colspan="2">template&lt;const auto &amp; Config, typename CharT , typename Hash , std::size_t FlagSetSize&gt; </td></tr>
-<tr class="memitem:ad984186aaf0b3752d4ba6bb7dca63e2d"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#ad984186aaf0b3752d4ba6bb7dca63e2d">parse_usage</a> (auto out) noexcept -&gt; std::expected&lt; <a class="el" href="structcmd_1_1parser__def.html">parser_def</a>&lt; std::remove_cvref_t&lt; decltype(Config)&gt; &gt;, <a class="el" href="classcmd_1_1usage__parse__error.html">usage_parse_error</a>&lt; Config &gt; &gt;</td></tr>
-<tr class="separator:ad984186aaf0b3752d4ba6bb7dca63e2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeea6d2df5db2d7b7c0b027af3c5df339"><td class="memTemplParams" colspan="2">template&lt;const auto &amp; Config, typename CharT , typename Hash , std::size_t FlagSetSize&gt; </td></tr>
+<tr class="memitem:aeea6d2df5db2d7b7c0b027af3c5df339"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#aeea6d2df5db2d7b7c0b027af3c5df339">parse_usage</a> (auto out) noexcept -&gt; std::expected&lt; <a class="el" href="structcmd_1_1parser__def.html">parser_def</a>&lt; std::remove_cvref_t&lt; decltype(Config)&gt; &gt;, <a class="el" href="structcmd_1_1detail_1_1define__error.html">define_error</a> &gt;</td></tr>
+<tr class="separator:aeea6d2df5db2d7b7c0b027af3c5df339"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a5b49c45eab66f8b32fdc8affa2ee07f1"><td class="memItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#a5b49c45eab66f8b32fdc8affa2ee07f1">define_error_buffer_size</a> = 1024</td></tr>
+<tr class="separator:a5b49c45eab66f8b32fdc8affa2ee07f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade49cd630dfe36eda15a72e0f0c7155f"><td class="memItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#ade49cd630dfe36eda15a72e0f0c7155f">index_str_buffer_size</a> = sizeof(std::size_t) * CHAR_BIT / 3</td></tr>
+<tr class="separator:ade49cd630dfe36eda15a72e0f0c7155f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52a2665aeb79320b49df8482d99ccbab"><td class="memItemLeft" align="right" valign="top">constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#a52a2665aeb79320b49df8482d99ccbab">polyhash_base</a> = 13</td></tr>
+<tr class="separator:a52a2665aeb79320b49df8482d99ccbab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Implementation details. Use at your own risk. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="ad984186aaf0b3752d4ba6bb7dca63e2d" name="ad984186aaf0b3752d4ba6bb7dca63e2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad984186aaf0b3752d4ba6bb7dca63e2d">&#9670;&nbsp;</a></span>parse_usage()</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="ab7827f1157ccb07918f9264d0dc21ede" name="ab7827f1157ccb07918f9264d0dc21ede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7827f1157ccb07918f9264d0dc21ede">&#9670;&nbsp;</a></span>define_error_ref_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="namespacecmd_1_1detail.html#ab7827f1157ccb07918f9264d0dc21ede">cmd::detail::define_error_ref_type</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab7827f1157ccb07918f9264d0dc21edeacb5e100e5a9a3e7f6d1fd97512215282" name="ab7827f1157ccb07918f9264d0dc21edeacb5e100e5a9a3e7f6d1fd97512215282"></a>error&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab7827f1157ccb07918f9264d0dc21edea7b83d3f08fa392b79e3f553b585971cd" name="ab7827f1157ccb07918f9264d0dc21edea7b83d3f08fa392b79e3f553b585971cd"></a>warning&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab7827f1157ccb07918f9264d0dc21edeaaad653ca3ee669635f2938b73098b6d7" name="ab7827f1157ccb07918f9264d0dc21edeaaad653ca3ee669635f2938b73098b6d7"></a>note&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="error_8hpp_source.html#l00010">10</a> of file <a class="el" href="error_8hpp_source.html">error.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="aeea6d2df5db2d7b7c0b027af3c5df339" name="aeea6d2df5db2d7b7c0b027af3c5df339"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeea6d2df5db2d7b7c0b027af3c5df339">&#9670;&nbsp;</a></span>parse_usage()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -124,7 +177,7 @@ template&lt;const auto &amp; Config, typename CharT , typename Hash , std::size_
           <td>(</td>
           <td class="paramtype">auto&#160;</td>
           <td class="paramname"><em>out</em></td><td>)</td>
-          <td> -&gt; std::expected&lt;<a class="el" href="structcmd_1_1parser__def.html">parser_def</a>&lt;std::remove_cvref_t&lt;decltype(Config)&gt;&gt;, <a class="el" href="classcmd_1_1usage__parse__error.html">usage_parse_error</a>&lt;Config&gt;&gt; </td>
+          <td> -&gt; std::expected&lt;<a class="el" href="structcmd_1_1parser__def.html">parser_def</a>&lt;std::remove_cvref_t&lt;decltype(Config)&gt;&gt;, <a class="el" href="structcmd_1_1detail_1_1define__error.html">define_error</a>&gt; </td>
         </tr>
       </table>
   </td>
@@ -133,8 +186,79 @@ template&lt;const auto &amp; Config, typename CharT , typename Hash , std::size_
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">exclude</td><td>needs to be sorted</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00733">733</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00743">743</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a5b49c45eab66f8b32fdc8affa2ee07f1" name="a5b49c45eab66f8b32fdc8affa2ee07f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b49c45eab66f8b32fdc8affa2ee07f1">&#9670;&nbsp;</a></span>define_error_buffer_size</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr std::size_t cmd::detail::define_error_buffer_size = 1024</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="error_8hpp_source.html#l00008">8</a> of file <a class="el" href="error_8hpp_source.html">error.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ade49cd630dfe36eda15a72e0f0c7155f" name="ade49cd630dfe36eda15a72e0f0c7155f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade49cd630dfe36eda15a72e0f0c7155f">&#9670;&nbsp;</a></span>index_str_buffer_size</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr std::size_t cmd::detail::index_str_buffer_size = sizeof(std::size_t) * CHAR_BIT / 3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="error_8hpp_source.html#l00009">9</a> of file <a class="el" href="error_8hpp_source.html">error.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a52a2665aeb79320b49df8482d99ccbab" name="a52a2665aeb79320b49df8482d99ccbab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52a2665aeb79320b49df8482d99ccbab">&#9670;&nbsp;</a></span>polyhash_base</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr size_t cmd::detail::polyhash_base = 13</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="hash_8hpp_source.html#l00011">11</a> of file <a class="el" href="hash_8hpp_source.html">hash.hpp</a>.</p>
 
 </div>
 </div>

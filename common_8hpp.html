@@ -108,11 +108,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="common_8hpp__dep__incl.png" border="0" usemap="#acommon_8hppdep" alt=""/></div>
 <map name="acommon_8hppdep" id="acommon_8hppdep">
-<area shape="rect" title=" " alt="" coords="98,5,194,32"/>
+<area shape="rect" title=" " alt="" coords="134,5,230,32"/>
 <area shape="rect" href="chartypes_8hpp.html" title=" " alt="" coords="5,80,108,107"/>
-<area shape="rect" href="parser_8hpp.html" title=" " alt="" coords="105,155,187,181"/>
-<area shape="rect" href="hash_8hpp.html" title=" " alt="" coords="183,80,258,107"/>
-<area shape="rect" href="config__default_8hpp.html" title=" " alt="" coords="83,229,209,256"/>
+<area shape="rect" href="parser_8hpp.html" title=" " alt="" coords="141,155,223,181"/>
+<area shape="rect" href="error_8hpp.html" title=" " alt="" coords="183,80,255,107"/>
+<area shape="rect" href="hash_8hpp.html" title=" " alt="" coords="279,80,354,107"/>
+<area shape="rect" href="config__default_8hpp.html" title=" " alt="" coords="119,229,245,256"/>
 </map>
 </div>
 </div>
@@ -159,7 +160,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    (\</div>
 <div class="line">    std::iter_type&lt;std::remove_cvref_t&lt;name&gt;&gt; &amp;&amp;\</div>
-<div class="line">    std::is_same_v&lt;typename std::iterator_traits&lt;std::remove_cvref_t&lt;name&gt;&gt;::value_type, type&gt;\</div>
+<div class="line">    std::is_convertible_v&lt;typename std::iterator_traits&lt;std::remove_cvref_t&lt;name&gt;&gt;::reference_type, type&gt;\</div>
 <div class="line">)</div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l00006">6</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
@@ -199,7 +200,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    (\</div>
 <div class="line">    ranges::rng_type&lt;std::remove_cvref_t&lt;name&gt;&gt; &amp;&amp;\</div>
-<div class="line">    std::is_same_v&lt;ranges::range_value_t&lt;std::remove_cvref_t&lt;name&gt;&gt;, type&gt;\</div>
+<div class="line">    std::is_convertible_v&lt;ranges::range_reference_t&lt;std::remove_cvref_t&lt;name&gt;&gt;, type&gt;\</div>
 <div class="line">)</div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l00010">10</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>

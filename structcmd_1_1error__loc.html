@@ -98,10 +98,10 @@ $(document).ready(function(){initNavTree('structcmd_1_1error__loc.html',''); ini
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a7b16cd3b953ddc142f0fff4a3941d163"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1error__loc.html#a7b16cd3b953ddc142f0fff4a3941d163">arg_loc</a></td></tr>
+<tr class="memitem:a7b16cd3b953ddc142f0fff4a3941d163"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1error__loc.html#a7b16cd3b953ddc142f0fff4a3941d163">arg_loc</a> = -1</td></tr>
+<tr class="memdesc:a7b16cd3b953ddc142f0fff4a3941d163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of argument. -1: error cannot be pinpointed.  <a href="structcmd_1_1error__loc.html#a7b16cd3b953ddc142f0fff4a3941d163">More...</a><br /></td></tr>
 <tr class="separator:a7b16cd3b953ddc142f0fff4a3941d163"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f21a0e409250e78c86734464f352d99"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1error__loc.html#a3f21a0e409250e78c86734464f352d99">in_arg_loc</a></td></tr>
-<tr class="memdesc:a3f21a0e409250e78c86734464f352d99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of argument. -1: error cannot be pinpointed.  <a href="structcmd_1_1error__loc.html#a3f21a0e409250e78c86734464f352d99">More...</a><br /></td></tr>
+<tr class="memitem:a3f21a0e409250e78c86734464f352d99"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1error__loc.html#a3f21a0e409250e78c86734464f352d99">in_arg_loc</a> = -1</td></tr>
 <tr class="separator:a3f21a0e409250e78c86734464f352d99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -116,12 +116,14 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::size_t cmd::error_loc::arg_loc</td>
+          <td class="memname">std::size_t cmd::error_loc::arg_loc = -1</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00214">214</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+<p>Index of argument. -1: error cannot be pinpointed. </p>
+
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00215">215</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -132,14 +134,13 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::size_t cmd::error_loc::in_arg_loc</td>
+          <td class="memname">std::size_t cmd::error_loc::in_arg_loc = -1</td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p >Index of character in the argument. -1: subject is invalid (e.g. when it is thrown as part of an <code><a class="el" href="structcmd_1_1parser_1_1argument__error.html">parser::argument_error</a></code>, it means the variable does not exist). </p>
 
-<p>Index of argument. -1: error cannot be pinpointed. </p>
-
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00215">215</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00218">218</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>

@@ -6,5 +6,5 @@ var searchData=
   ['error_5ftmpl_3',['error_tmpl',['../structcmd_1_1config_1_1type.html#a2b1c4bfce29b2ccc2bed63137bc5124c',1,'cmd::config::type']]],
   ['error_5ftypes_5fn_4',['error_types_n',['../namespacecmd.html#aa25e488c5d325addbad1133b74094f93',1,'cmd']]],
   ['escape_5',['escape',['../structcmd_1_1special__chars.html#a24dc40125228957a58fd4ce3e7dccb7b',1,'cmd::special_chars']]],
-  ['explanation_6',['explanation',['../structcmd_1_1config_1_1type.html#ae4cd6983dd3e022c065fd444ba9d03a8',1,'cmd::config::type']]]
+  ['explanation_6',['explanation',['../structcmd_1_1config_1_1type.html#a68d84ce4e3a1d97a804a4a1349433c53',1,'cmd::config::type']]]
 ];

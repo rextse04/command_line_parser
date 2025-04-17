@@ -87,11 +87,12 @@ $(document).ready(function(){initNavTree('md_docs_grammar.html',''); initResizab
   <div class="headertitle"><div class="title">Usage Text Grammar </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p >Every valid usage is of the form <code>&lt;arg1&gt; &lt;arg2&gt; ...</code>, where each <code>&lt;argi&gt;</code> must be one of the following:</p><ol type="1">
-<li>Option. Any string that does not start with a special character sequence is an option. Options are positional arguments and must be exactly matched.</li>
+<div class="textblock"><p >Every valid usage is of the form <code>&lt;arg1&gt; &lt;arg2&gt; ... &lt;argn&gt;</code>, where each <code>&lt;argi&gt;</code> must be one of the following:</p><ol type="1">
+<li>Option. Any <code>&lt;argi&gt;</code> that does not start with a special character sequence is an option. Options are positional arguments and must be exactly matched.</li>
 <li>Compound option. If <code>&lt;argi&gt;</code> is enclosed by <code>config.specials.compound_open</code> (default: <code>(</code>) and <code>config.specials.compound_close</code> (default: <code>)</code>), it is a compound option. Compound options are simply a convenient way to put multiple options at the same position. Possible options are separated by <code>config.specials.compound_divider</code> (default:<code>|</code>).</li>
 <li>Variable. Variables are enclosed by <code>config.specials.var_open</code> (default: <code>&lt;</code>) and <code>config.specials.var_close</code> (default: <code>&gt;</code>). No two variables can be put at the same position.</li>
 <li>Variable option. Variables options are of the form <code>&lt;var&gt;=(opt1|opt2[|...])</code>. If <code>config.specials.var_capture</code> (default: <code>...</code>) is present, <code>&lt;var&gt;</code> is an ordinary variable - the options are simply for hinting purposes. Otherwise, <code>&lt;var&gt;</code> only accepts the listed options.</li>
+<li>Variadic variable. <code>&lt;argi&gt;</code> is a variadic variable if it is exactly <code>config.specials.variadic</code>. It accepts any number of positional arguments (including 0). Naturally, only flags can follow a variadic variable, and two variadic variables cannot be declared in the same position.</li>
 <li>Flag. A flag is of the form <code>[--flag[=&lt;var&gt;]]</code>. Flags are non-positional - they can be placed in any order in a command, as long as they are put after all positional arguments. If <code>=&lt;var&gt;</code> is present, an argument is required and captured in <code>&lt;var&gt;</code>, otherwise <code>--flag</code> is a boolean flag.</li>
 </ol>
 <p >All other strings are ill-formed. </p>

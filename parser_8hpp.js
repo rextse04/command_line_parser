@@ -28,7 +28,6 @@ var parser_8hpp =
     [ "cmd::parser< Info >::argument_error< Args >", "structcmd_1_1parser_1_1argument__error.html", "structcmd_1_1parser_1_1argument__error" ],
     [ "cmd::parser< Info >::part_parse_result", "structcmd_1_1parser_1_1part__parse__result.html", "structcmd_1_1parser_1_1part__parse__result" ],
     [ "cmd::parser< Info >::parse_result< Args >", "structcmd_1_1parser_1_1parse__result.html", "structcmd_1_1parser_1_1parse__result" ],
-    [ "cmd::usage_parse_error< Config >", "classcmd_1_1usage__parse__error.html", "classcmd_1_1usage__parse__error" ],
     [ "std::formatter< Rng, typename Rng::format_char_type >", "structstd_1_1formatter_3_01Rng_00_01typename_01Rng_1_1format__char__type_01_4.html", "structstd_1_1formatter_3_01Rng_00_01typename_01Rng_1_1format__char__type_01_4" ],
     [ "std::formatter< Error, typename Error::super_type::format_char_type >", "structstd_1_1formatter_3_01Error_00_01typename_01Error_1_1super__type_1_1format__char__type_01_4.html", "structstd_1_1formatter_3_01Error_00_01typename_01Error_1_1super__type_1_1format__char__type_01_4" ],
     [ "std::formatter< Ref, typename Ref::super_type::format_char_type >", "structstd_1_1formatter_3_01Ref_00_01typename_01Ref_1_1super__type_1_1format__char__type_01_4.html", "structstd_1_1formatter_3_01Ref_00_01typename_01Ref_1_1super__type_1_1format__char__type_01_4" ],
@@ -36,9 +35,6 @@ var parser_8hpp =
     [ "cmd::usage_id", "conceptcmd_1_1usage__id.html", null ],
     [ "cmd::config_instance", "conceptcmd_1_1config__instance.html", null ],
     [ "cmd::hasher", "conceptcmd_1_1hasher.html", null ],
-    [ "chk_err", "parser_8hpp.html#a48474087a1b4e7d6650f4d45217ee0a5", null ],
-    [ "raise", "parser_8hpp.html#a7c94f2e46f62b001bcaf71ba253ed203", null ],
-    [ "rraise", "parser_8hpp.html#a64ae4806a330bc329041edcd38a1534d", null ],
     [ "config_type_of", "parser_8hpp.html#aa9772364093fa1ba8f8ddb0d80015b5b", null ],
     [ "error_type", "parser_8hpp.html#a710b060831108591db19aca520783ee6", [
       [ "unknown_option", "parser_8hpp.html#a710b060831108591db19aca520783ee6a36c09abd7943c607e22274d623f1292b", null ],
@@ -55,11 +51,11 @@ var parser_8hpp =
       [ "option", "parser_8hpp.html#a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac", null ],
       [ "variable", "parser_8hpp.html#a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26", null ],
       [ "variable_option", "parser_8hpp.html#a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2", null ],
+      [ "variadic", "parser_8hpp.html#a03c55bfb628d908351a8dfd37dbbc1f1ad87cd2579681533b664d4d82b7ad31d9", null ],
       [ "end", "parser_8hpp.html#a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53", null ]
     ] ],
     [ "define_parser", "parser_8hpp.html#a94b6dc3f4a25ab35cb53a7b037a4dd25", null ],
     [ "get_hash", "parser_8hpp.html#a826d8d5d005cc12f550849e289b15262", null ],
-    [ "parse_usage", "parser_8hpp.html#ad984186aaf0b3752d4ba6bb7dca63e2d", null ],
-    [ "error_types_n", "parser_8hpp.html#aa25e488c5d325addbad1133b74094f93", null ],
-    [ "usage_parse_msg_max_size", "parser_8hpp.html#a642b673ca8f049498b7033c743a78084", null ]
+    [ "parse_usage", "parser_8hpp.html#aeea6d2df5db2d7b7c0b027af3c5df339", null ],
+    [ "error_types_n", "parser_8hpp.html#aa25e488c5d325addbad1133b74094f93", null ]
 ];

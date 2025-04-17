@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['variable_0',['variable',['../namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26',1,'cmd']]],
-  ['variable_5foption_1',['variable_option',['../namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2',1,'cmd']]]
+  ['unknown_5ferror_0',['unknown_error',['../namespacecmd.html#a710b060831108591db19aca520783ee6a4e44c97a51e5519cd277f335de285ead',1,'cmd']]],
+  ['unknown_5fflag_1',['unknown_flag',['../namespacecmd.html#a710b060831108591db19aca520783ee6a08a7fd01931d734499b97e2d977c5626',1,'cmd']]],
+  ['unknown_5foption_2',['unknown_option',['../namespacecmd.html#a710b060831108591db19aca520783ee6a36c09abd7943c607e22274d623f1292b',1,'cmd']]]
 ];

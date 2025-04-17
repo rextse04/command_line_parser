@@ -15,7 +15,6 @@ var namespacecmd =
     [ "receiver< Args & >", "structcmd_1_1receiver_3_01Args_01_6_01_4.html", "structcmd_1_1receiver_3_01Args_01_6_01_4" ],
     [ "special_chars", "structcmd_1_1special__chars.html", "structcmd_1_1special__chars" ],
     [ "usage", "structcmd_1_1usage.html", "structcmd_1_1usage" ],
-    [ "usage_parse_error", "classcmd_1_1usage__parse__error.html", "classcmd_1_1usage__parse__error" ],
     [ "usage_id", "conceptcmd_1_1usage__id.html", null ],
     [ "config_instance", "conceptcmd_1_1config__instance.html", null ],
     [ "hasher", "conceptcmd_1_1hasher.html", null ],
@@ -35,10 +34,10 @@ var namespacecmd =
       [ "option", "namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac", null ],
       [ "variable", "namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26", null ],
       [ "variable_option", "namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2", null ],
+      [ "variadic", "namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ad87cd2579681533b664d4d82b7ad31d9", null ],
       [ "end", "namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53", null ]
     ] ],
     [ "define_parser", "namespacecmd.html#a94b6dc3f4a25ab35cb53a7b037a4dd25", null ],
     [ "get_hash", "namespacecmd.html#a826d8d5d005cc12f550849e289b15262", null ],
-    [ "error_types_n", "namespacecmd.html#aa25e488c5d325addbad1133b74094f93", null ],
-    [ "usage_parse_msg_max_size", "namespacecmd.html#a642b673ca8f049498b7033c743a78084", null ]
+    [ "error_types_n", "namespacecmd.html#aa25e488c5d325addbad1133b74094f93", null ]
 ];

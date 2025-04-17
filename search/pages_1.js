@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['usage_20text_20grammar_0',['Usage Text Grammar',['../md_docs_grammar.html',1,'']]]
+  ['defining_20a_20parser_20on_20character_20types_20other_20than_20_3ctt_3echar_3c_2ftt_3e_0',['Defining a parser on character types other than &lt;tt&gt;char&lt;/tt&gt;',['../md_docs_chartypes.html',1,'']]]
 ];

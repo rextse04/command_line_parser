@@ -88,7 +88,6 @@ $(document).ready(function(){initNavTree('parser_8hpp.html',''); initResizable()
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#concepts">Concepts</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a> &#124;
@@ -108,28 +107,32 @@ $(document).ready(function(){initNavTree('parser_8hpp.html',''); initResizable()
 <code>#include &quot;<a class="el" href="common_8hpp_source.html">common.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="chartypes_8hpp_source.html">chartypes.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="hash_8hpp_source.html">hash.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="error_8hpp_source.html">error.hpp</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for parser.hpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="parser_8hpp__incl.png" border="0" usemap="#aparser_8hpp" alt=""/></div>
 <map name="aparser_8hpp" id="aparser_8hpp">
-<area shape="rect" title=" " alt="" coords="453,5,536,32"/>
+<area shape="rect" title=" " alt="" coords="497,5,580,32"/>
 <area shape="rect" title=" " alt="" coords="5,80,56,107"/>
 <area shape="rect" title=" " alt="" coords="80,80,155,107"/>
 <area shape="rect" title=" " alt="" coords="179,80,234,107"/>
 <area shape="rect" title=" " alt="" coords="258,80,313,107"/>
-<area shape="rect" title=" " alt="" coords="337,80,396,107"/>
-<area shape="rect" title=" " alt="" coords="420,80,495,107"/>
-<area shape="rect" title=" " alt="" coords="611,155,683,181"/>
-<area shape="rect" title=" " alt="" coords="570,80,630,107"/>
-<area shape="rect" title=" " alt="" coords="654,80,706,107"/>
-<area shape="rect" href="common_8hpp.html" title=" " alt="" coords="801,155,897,181"/>
-<area shape="rect" href="chartypes_8hpp.html" title=" " alt="" coords="730,80,833,107"/>
-<area shape="rect" href="hash_8hpp.html" title=" " alt="" coords="908,80,983,107"/>
-<area shape="rect" title=" " alt="" coords="723,229,784,256"/>
-<area shape="rect" title=" " alt="" coords="808,229,891,256"/>
-<area shape="rect" title=" " alt="" coords="915,229,989,256"/>
-<area shape="rect" title=" " alt="" coords="921,155,1009,181"/>
+<area shape="rect" title=" " alt="" coords="708,155,767,181"/>
+<area shape="rect" title=" " alt="" coords="388,80,463,107"/>
+<area shape="rect" title=" " alt="" coords="365,155,437,181"/>
+<area shape="rect" title=" " alt="" coords="614,80,674,107"/>
+<area shape="rect" title=" " alt="" coords="698,80,750,107"/>
+<area shape="rect" href="common_8hpp.html" title=" " alt="" coords="791,155,887,181"/>
+<area shape="rect" href="chartypes_8hpp.html" title=" " alt="" coords="487,80,590,107"/>
+<area shape="rect" href="hash_8hpp.html" title=" " alt="" coords="972,80,1047,107"/>
+<area shape="rect" href="error_8hpp.html" title=" " alt="" coords="876,80,948,107"/>
+<area shape="rect" title=" " alt="" coords="712,229,773,256"/>
+<area shape="rect" title=" " alt="" coords="797,229,880,256"/>
+<area shape="rect" title=" " alt="" coords="904,229,979,256"/>
+<area shape="rect" title=" " alt="" coords="511,155,567,181"/>
+<area shape="rect" title=" " alt="" coords="1009,155,1097,181"/>
+<area shape="rect" title=" " alt="" coords="911,155,985,181"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -200,8 +203,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1parser_1_1parse__result.html">cmd::parser&lt; Info &gt;::parse_result&lt; Args &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Result of a successful <code>parse</code>.  <a href="structcmd_1_1parser_1_1parse__result.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmd_1_1usage__parse__error.html">cmd::usage_parse_error&lt; Config &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstd_1_1formatter_3_01Rng_00_01typename_01Rng_1_1format__char__type_01_4.html">std::formatter&lt; Rng, typename Rng::format_char_type &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstd_1_1formatter_3_01Error_00_01typename_01Error_1_1super__type_1_1format__char__type_01_4.html">std::formatter&lt; Error, typename Error::super_type::format_char_type &gt;</a></td></tr>
@@ -228,15 +229,6 @@ Concepts</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptcmd_1_1hasher.html">cmd::hasher</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a48474087a1b4e7d6650f4d45217ee0a5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8hpp.html#a48474087a1b4e7d6650f4d45217ee0a5">chk_err</a>(msg)&#160;&#160;&#160;static_assert(std::string_view{msg}.size() - 1 &lt;= usage_parse_msg_max_size, &quot;Error message is too long!&quot;)</td></tr>
-<tr class="separator:a48474087a1b4e7d6650f4d45217ee0a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64ae4806a330bc329041edcd38a1534d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8hpp.html#a64ae4806a330bc329041edcd38a1534d">rraise</a>&#160;&#160;&#160;throw</td></tr>
-<tr class="separator:a64ae4806a330bc329041edcd38a1534d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c94f2e46f62b001bcaf71ba253ed203"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8hpp.html#a7c94f2e46f62b001bcaf71ba253ed203">raise</a>&#160;&#160;&#160;throw</td></tr>
-<tr class="separator:a7c94f2e46f62b001bcaf71ba253ed203"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:aa9772364093fa1ba8f8ddb0d80015b5b"><td class="memTemplParams" colspan="2">template&lt;config_instance auto &amp; Config&gt; </td></tr>
@@ -260,10 +252,14 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:a710b060831108591db19aca520783ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03c55bfb628d908351a8dfd37dbbc1f1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1">cmd::parse_node_type</a> { <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac">cmd::option</a>
+<tr class="memitem:a03c55bfb628d908351a8dfd37dbbc1f1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1">cmd::parse_node_type</a> { <br />
+&#160;&#160;<a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac">cmd::option</a>
 , <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26">cmd::variable</a>
 , <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2">cmd::variable_option</a>
-, <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53">cmd::end</a>
+, <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ad87cd2579681533b664d4d82b7ad31d9">cmd::variadic</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53">cmd::end</a>
+<br />
  }</td></tr>
 <tr class="separator:a03c55bfb628d908351a8dfd37dbbc1f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -272,9 +268,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a826d8d5d005cc12f550849e289b15262"><td class="memTemplParams" colspan="2">template&lt;typename Hash , std::size_t SetSize&gt; </td></tr>
 <tr class="memitem:a826d8d5d005cc12f550849e289b15262"><td class="memTemplItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a826d8d5d005cc12f550849e289b15262">cmd::get_hash</a> (auto str) noexcept</td></tr>
 <tr class="separator:a826d8d5d005cc12f550849e289b15262"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad984186aaf0b3752d4ba6bb7dca63e2d"><td class="memTemplParams" colspan="2">template&lt;const auto &amp; Config, typename CharT , typename Hash , std::size_t FlagSetSize&gt; </td></tr>
-<tr class="memitem:ad984186aaf0b3752d4ba6bb7dca63e2d"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#ad984186aaf0b3752d4ba6bb7dca63e2d">cmd::detail::parse_usage</a> (auto out) noexcept -&gt; std::expected&lt; parser_def&lt; std::remove_cvref_t&lt; decltype(Config)&gt; &gt;, usage_parse_error&lt; Config &gt; &gt;</td></tr>
-<tr class="separator:ad984186aaf0b3752d4ba6bb7dca63e2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeea6d2df5db2d7b7c0b027af3c5df339"><td class="memTemplParams" colspan="2">template&lt;const auto &amp; Config, typename CharT , typename Hash , std::size_t FlagSetSize&gt; </td></tr>
+<tr class="memitem:aeea6d2df5db2d7b7c0b027af3c5df339"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecmd_1_1detail.html#aeea6d2df5db2d7b7c0b027af3c5df339">cmd::detail::parse_usage</a> (auto out) noexcept -&gt; std::expected&lt; parser_def&lt; std::remove_cvref_t&lt; decltype(Config)&gt; &gt;, define_error &gt;</td></tr>
+<tr class="separator:aeea6d2df5db2d7b7c0b027af3c5df339"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94b6dc3f4a25ab35cb53a7b037a4dd25"><td class="memTemplParams" colspan="2">template&lt;config_instance auto &amp; Config, std::size_t FlagSetSize = 512, typename Hash  = hash&lt;std::basic_string_view&lt;typename config_type_of&lt;Config&gt;::char_type&gt;&gt;&gt; <br />
 requires requires(std::basic_string_view&lt;typename config_type_of&lt;Config&gt;::char_type&gt; str) { {Hash{}(str)} -&gt; std::same_as&lt;size_t&gt;; }</td></tr>
 <tr class="memitem:a94b6dc3f4a25ab35cb53a7b037a4dd25"><td class="memTemplItemLeft" align="right" valign="top">consteval auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a94b6dc3f4a25ab35cb53a7b037a4dd25">cmd::define_parser</a> () noexcept</td></tr>
@@ -284,58 +280,7 @@ requires requires(std::basic_string_view&lt;typename config_type_of&lt;Config&gt
 Variables</h2></td></tr>
 <tr class="memitem:aa25e488c5d325addbad1133b74094f93"><td class="memItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#aa25e488c5d325addbad1133b74094f93">cmd::error_types_n</a> = std::to_underlying(error_type::unknown_error) + 1</td></tr>
 <tr class="separator:aa25e488c5d325addbad1133b74094f93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a642b673ca8f049498b7033c743a78084"><td class="memItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a642b673ca8f049498b7033c743a78084">cmd::usage_parse_msg_max_size</a> = 128</td></tr>
-<tr class="separator:a642b673ca8f049498b7033c743a78084"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a48474087a1b4e7d6650f4d45217ee0a5" name="a48474087a1b4e7d6650f4d45217ee0a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48474087a1b4e7d6650f4d45217ee0a5">&#9670;&nbsp;</a></span>chk_err</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define chk_err</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">msg</td><td>)</td>
-          <td>&#160;&#160;&#160;static_assert(std::string_view{msg}.size() - 1 &lt;= usage_parse_msg_max_size, &quot;Error message is too long!&quot;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00730">730</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a7c94f2e46f62b001bcaf71ba253ed203" name="a7c94f2e46f62b001bcaf71ba253ed203"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c94f2e46f62b001bcaf71ba253ed203">&#9670;&nbsp;</a></span>raise</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define raise&#160;&#160;&#160;throw</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a64ae4806a330bc329041edcd38a1534d" name="a64ae4806a330bc329041edcd38a1534d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64ae4806a330bc329041edcd38a1534d">&#9670;&nbsp;</a></span>rraise</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define rraise&#160;&#160;&#160;throw</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

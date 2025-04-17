@@ -137,8 +137,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcmd_1_1usage.html">usage</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A usage defines a way to use the CLI.  <a href="structcmd_1_1usage.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmd_1_1usage__parse__error.html">usage_parse_error</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="concepts" name="concepts"></a>
 Concepts</h2></td></tr>
@@ -172,10 +170,14 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:a710b060831108591db19aca520783ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03c55bfb628d908351a8dfd37dbbc1f1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1">parse_node_type</a> { <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac">option</a>
+<tr class="memitem:a03c55bfb628d908351a8dfd37dbbc1f1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1">parse_node_type</a> { <br />
+&#160;&#160;<a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac">option</a>
 , <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26">variable</a>
 , <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2">variable_option</a>
-, <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53">end</a>
+, <a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1ad87cd2579681533b664d4d82b7ad31d9">variadic</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacecmd.html#a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53">end</a>
+<br />
  }</td></tr>
 <tr class="separator:a03c55bfb628d908351a8dfd37dbbc1f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -193,8 +195,6 @@ requires requires(std::basic_string_view&lt;typename <a class="el" href="namespa
 Variables</h2></td></tr>
 <tr class="memitem:aa25e488c5d325addbad1133b74094f93"><td class="memItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#aa25e488c5d325addbad1133b74094f93">error_types_n</a> = std::to_underlying(<a class="el" href="namespacecmd.html#a710b060831108591db19aca520783ee6a4e44c97a51e5519cd277f335de285ead">error_type::unknown_error</a>) + 1</td></tr>
 <tr class="separator:aa25e488c5d325addbad1133b74094f93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a642b673ca8f049498b7033c743a78084"><td class="memItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecmd.html#a642b673ca8f049498b7033c743a78084">usage_parse_msg_max_size</a> = 128</td></tr>
-<tr class="separator:a642b673ca8f049498b7033c743a78084"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="aa9772364093fa1ba8f8ddb0d80015b5b" name="aa9772364093fa1ba8f8ddb0d80015b5b"></a>
@@ -211,7 +211,7 @@ template&lt;config_instance auto &amp; Config&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l01012">1012</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l01079">1079</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -252,7 +252,7 @@ Guarantees:</p><ol type="1">
 <tr><td class="fieldname"><a id="a710b060831108591db19aca520783ee6a4e44c97a51e5519cd277f335de285ead" name="a710b060831108591db19aca520783ee6a4e44c97a51e5519cd277f335de285ead"></a>unknown_error&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00020">20</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00021">21</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -279,6 +279,7 @@ Guarantees:</p><ol type="1">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac" name="a03c55bfb628d908351a8dfd37dbbc1f1aef3e30e070f70244fd6578d88a6b77ac"></a>option&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26" name="a03c55bfb628d908351a8dfd37dbbc1f1ae04aa5104d082e4a51d241391941ba26"></a>variable&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2" name="a03c55bfb628d908351a8dfd37dbbc1f1a4df402f6a96763bf446e6da56549c8c2"></a>variable_option&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a03c55bfb628d908351a8dfd37dbbc1f1ad87cd2579681533b664d4d82b7ad31d9" name="a03c55bfb628d908351a8dfd37dbbc1f1ad87cd2579681533b664d4d82b7ad31d9"></a>variadic&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53" name="a03c55bfb628d908351a8dfd37dbbc1f1a7f021a1415b86f2d013b2618fb31ae53"></a>end&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -322,7 +323,7 @@ requires requires(std::basic_string_view&lt;typename <a class="el" href="namespa
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code><a class="el" href="structcmd_1_1parser__info.html">parser_info</a></code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l01025">1025</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l01092">1092</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
@@ -378,31 +379,7 @@ template&lt;typename Hash , std::size_t SetSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00031">31</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a642b673ca8f049498b7033c743a78084" name="a642b673ca8f049498b7033c743a78084"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a642b673ca8f049498b7033c743a78084">&#9670;&nbsp;</a></span>usage_parse_msg_max_size</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr std::size_t cmd::usage_parse_msg_max_size = 128</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00672">672</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parser_8hpp_source.html#l00032">32</a> of file <a class="el" href="parser_8hpp_source.html">parser.hpp</a>.</p>
 
 </div>
 </div>
