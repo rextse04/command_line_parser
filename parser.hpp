@@ -267,24 +267,21 @@ namespace cmd {
         /// This is because the `index` is computed at compile time from variable name.
         struct var_name {
             std::size_t index;
-            consteval var_name(const char_type* name) noexcept {
-                std::array<bool, Info.var_names.size()> match;
-                for (std::size_t i = 1; i < match.size(); ++i) {
-                    match[i] = (name == Info.var_names[i]);
+            consteval var_name(const char_type* name) {
+                for (auto [i, var_name] : Info.var_names | views::enumerate) {
+                    if (name == var_name) {
+                        index = i;
+                        return;
+                    }
                 }
-                auto search = ranges::find(match | views::drop(1), true);
-                if (search == match.end()) {
-                    throw std::invalid_argument("Unknown variable.");
-                } else {
-                    index = search - match.begin();
-                }
+                throw std::invalid_argument("Unknown variable");
             }
         };
         /// Despite its name, the struct only stores the `index` of a flag.
         /// This is because the `index` is computed at compile time from flag name.
         struct flag_name {
             std::size_t index;
-            consteval flag_name(const char_type* name) noexcept {
+            consteval flag_name(const char_type* name) {
                 const std::size_t h = get_hash<hash_type, Info.flag_set.size()>(name);
                 if (name == Info.flag_set[h].name) [[likely]] {
                     index = h;
