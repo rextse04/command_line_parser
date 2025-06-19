@@ -320,7 +320,6 @@ namespace cmd {
             using tag = error_ref_tag;
             using super_type = parser;
             error_loc loc;
-
             /// Binds to `args` and set error location to invalid.
             explicit constexpr error_ref(Args&& args) :
                 receiver<Args>{std::forward<Args>(args)}, loc{-1uz} {}
@@ -344,10 +343,7 @@ namespace cmd {
         /// An error emitted during `parser::parse`.
         template <typename Args>
         struct parse_error : part_parse_error {
-            using tag = error_tag;
-            using super_type = parser;
             error_ref<Args> ref;
-
             /// Make a `parse_error` whose location cannot be pinpointed
             /// \param type: error type
             /// \param args: an `forward_range` of arguments that form the command
@@ -413,8 +409,6 @@ namespace cmd {
         template <typename Args>
         requires RANGE_OF(Args, forward_range, string_view_type)
         struct parse_result : part_parse_result, receiver<Args> {
-            using tag = parse_result_tag;
-            using super_type = parser;
             constexpr parse_result(result_type result, std::size_t usage_index, Args&& args) :
                 part_parse_result{result, usage_index}, receiver<Args>{std::forward<Args>(args)} {}
         };
