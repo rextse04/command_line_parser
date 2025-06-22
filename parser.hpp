@@ -91,14 +91,17 @@ namespace cmd {
     /// \tparam Result: type for identifying usages
     /// \tparam CharT: input character type
     /// \tparam FmtCharT: output character type
-    template <usage_id Result, char_like CharT = char, char_like FmtCharT = CharT>
+    template <usage_id Result, char_like CharT = char, char_like FmtCharT = CharT,
+        typename CharTraits = std::char_traits<CharT>, typename FmtCharTraits = std::char_traits<FmtCharT>>
     struct config {
         using tag = config_tag;
         using result_type = Result;
         using char_type = CharT;
         using format_char_type = FmtCharT;
-        using string_view_type = std::basic_string_view<char_type>;
-        using format_string_view_type = std::basic_string_view<format_char_type>;
+        using char_traits_type = CharTraits;
+        using format_char_traits_type = FmtCharTraits;
+        using string_view_type = std::basic_string_view<char_type, char_traits_type>;
+        using format_string_view_type = std::basic_string_view<format_char_type, format_char_traits_type>;
         using usage_type = usage<result_type, char_type>;
         using config_default_type = config_default<char_type, format_char_type>;
         template <size_t N>
@@ -185,28 +188,28 @@ namespace cmd {
     template <config_instance Config>
     struct parser_def {
         using tag = parser_def_tag;
+        using config_type = Config;
         std::size_t usage_size, tree_size, vars_size, flag_set_size, var_num;
         const Config& config;
     };
 
     struct parser_info_tag;
     /// (Computed) information of parser.
-    /// \tparam Result: type that identifies usages
-    /// \tparam CharT: input character type
-    /// \tparam Hash: hasher
     /// \tparam Def: parser definition
-    template <usage_id Result, char_like CharT, hasher<CharT> Hash, tagged<parser_def_tag> auto Def>
+    /// \tparam Hash: hasher
+    template <tagged<parser_def_tag> auto Def, hasher<typename decltype(Def)::super_type::char_type> Hash>
     struct parser_info {
         using tag = parser_info_tag;
-        using result_type = Result;
-        using char_type = CharT;
+        using config_type = decltype(Def)::super_type;
+        using result_type = config_type::result_type;
+        using char_type = config_type::char_type;
         using hash_type = Hash;
-        using string_view_type = std::basic_string_view<char_type>;
+        using string_view_type = config_type::string_view_type;
         static constexpr auto def = Def;
-        std::array<usage<Result, CharT>, Def.usage_size> usages;
-        std::array<parse_node<CharT>, Def.tree_size> tree;
+        std::array<usage<result_type, char_type>, Def.usage_size> usages;
+        std::array<parse_node<char_type>, Def.tree_size> tree;
         std::array<string_view_type, Def.vars_size> var_names;
-        std::array<flag_info<Def.usage_size, CharT>, Def.flag_set_size> flag_set;
+        std::array<flag_info<Def.usage_size, char_type>, Def.flag_set_size> flag_set;
     };
 
     /// Location of an error in a command.
@@ -248,16 +251,18 @@ namespace cmd {
         static constexpr const auto& config = Info.def.config;
         using info_type = std::remove_cvref_t<decltype(Info)>;
         using def_type = std::remove_cvref_t<decltype(def)>;
-        using config_type = std::remove_cvref_t<decltype(config)>;
-        using result_type = info_type::result_type;
-        using char_type = info_type::char_type;
-        using string_type = std::basic_string<char_type>;
-        using string_view_type = std::basic_string_view<char_type>;
-        using format_char_type = config_type::super_type::format_char_type;
-        using format_string_type = std::basic_string<format_char_type>;
-        using format_string_view_type = std::basic_string_view<format_char_type>;
+        using config_type = info_type::config_type;
+        using result_type = config_type::result_type;
+        using char_type = config_type::char_type;
+        using char_traits_type = config_type::char_traits_type;
+        using string_type = std::basic_string<char_type, char_traits_type>;
+        using string_view_type = config_type::string_view_type;
+        using format_char_type = config_type::format_char_type;
+        using format_char_traits_type = config_type::format_traits_type;
+        using format_string_type = std::basic_string<format_char_type, format_char_traits_type>;
+        using format_string_view_type = config_type::format_string_view_type;
         using hash_type = info_type::hash_type;
-        using refs_type = std::vector<const typename config_type::super_type::usage_type*>;
+        using refs_type = std::vector<const typename config_type::usage_type*>;
         using usage_range_type = detail::usage_range<config.usage_tmpl>;
         static constexpr auto input_stream = input_object<char_type>::value;
         static constexpr auto output_stream = output_object<format_char_type>::value;
@@ -596,20 +601,11 @@ namespace cmd {
         /// using `std::codecvt` with the system locale.
         constexpr auto parse(int argc, char* argv[])
         requires (!std::same_as<char_type, char>) {
-            const auto& facet = std::use_facet<std::codecvt<char_type, char, std::mbstate_t>>(std::locale(""));
             std::vector<string_type> args;
             args.reserve(argc - 1);
+            const translator<char, char_type, true> t{};
             for (std::string_view arg : views::counted(argv + 1, argc - 1)) {
-                args.emplace_back(arg.size(), char_type{0});
-                std::mbstate_t mb{};
-                const char* from_next;
-                char_type* to_next;
-                auto res = facet.in(mb, arg.data(), arg.data() + arg.size(), from_next,
-                    args.back().data(), args.back().data() + arg.size(), to_next);
-                if (res != std::codecvt_base::ok) {
-                    throw std::runtime_error("Unable to decode program arguments.");
-                }
-                args.back().resize(to_next - args.back().data());
+                args.push_back(t(arg, t.default_size_mul, ""));
             }
             return parse(std::move(args));
         }
@@ -628,22 +624,22 @@ namespace cmd {
                     if (escape) {
                         escape = false;
                     } else {
-                        if constexpr (config.specials.quote_open == config.specials.quote_close) {
-                            if (c == config.specials.quote_open) {
+                        if constexpr (char_traits_type::eq(config.specials.quote_open, config.specials.quote_close)) {
+                            if (char_traits_type::eq(c, config.specials.quote_open)) {
                                 quote_open = !quote_open;
                                 continue;
                             }
                         } else {
-                            if (c == config.specials.quote_open) {
+                            if (char_traits_type::eq(c, config.specials.quote_open)) {
                                 quote_open = true;
                                 continue;
                             }
-                            if (c == config.specials.quote_close) {
+                            if (char_traits_type::eq(c, config.specials.quote_close)) {
                                 quote_open = false;
                                 continue;
                             }
                         }
-                        if (c == config.specials.escape) {
+                        if (char_traits_type::eq(c, config.specials.escape)) {
                             escape = true;
                             continue;
                         }
@@ -672,7 +668,7 @@ namespace cmd {
                 ranges::subrange(iter_type(*input_stream), iter_type())
                 | views::take_while([](char_type c) {
                     const char_type eol = input_stream->widen('\n');
-                    if (c == eol) {
+                    if (char_traits_type::eq(c, eol)) {
                         input_stream->ignore(std::numeric_limits<std::streamsize>::max(), eol);
                         return false;
                     } else {
@@ -1086,7 +1082,7 @@ namespace cmd {
         using char_type = config_type::char_type;
         constexpr auto res = detail::parse_usage<Config, char_type, Hash, FlagSetSize>(nullptr);
         if constexpr (res) {
-            parser_info<result_type, char_type, Hash, *res> info;
+            parser_info<*res, Hash> info;
             detail::parse_usage<Config, char_type, Hash, FlagSetSize>(&info);
             return info;
         } else {
