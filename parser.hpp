@@ -6,7 +6,6 @@
 #include <vector>
 #include <expected>
 #include <iostream>
-#include <climits>
 #include <utility>
 #include "common.hpp"
 #include "chartypes.hpp"
@@ -620,7 +619,7 @@ namespace cmd {
             args.assign({{}});
             bool quote_open = false, escape = false;
             for (const char_type& c : str) {
-                if (quote_open || (c != config.specials.delimiter)) {
+                if (quote_open || !char_traits_type::eq(c, config.specials.delimiter)) {
                     if (escape) {
                         escape = false;
                     } else {
@@ -1151,28 +1150,29 @@ struct std::formatter<RefC, typename RefC::super_type::format_char_type> {
         constexpr const auto& specials = parser_type::config.specials;
         bool first = true, indicated = false;
         std::size_t i = 0;
+        constexpr cmd::translator<char_type, format_char_type> t{};
         for (string_view_type arg : ref.args) {
             if (first) {
                 first = false;
             } else {
-                *(out++) = specials.delimiter;
+                out = ranges::copy(t({&specials.delimiter, 1}), out).out;
             }
             if constexpr (RefC::mode == 0) {
-                out = ranges::copy(cmd::translator<char_type, format_char_type>{}(arg), out).out;
+                out = ranges::copy(t(arg), out).out;
             } else if constexpr (RefC::mode == 1) {
                 for (std::size_t j = 0; j < arg.size(); ++j) {
                     if ((i == ref.loc.arg_loc) && (j == ref.loc.in_arg_loc)) [[unlikely]] {
-                        *(out++) = specials.indicator;
+                        out = ranges::copy(t({&specials.indicator, 1}), out).out;
                         indicated = true;
                     } else {
-                        *(out++) = specials.delimiter;
+                        out = ranges::copy(t({&specials.delimiter, 1}), out).out;
                     }
                 }
             }
             ++i;
         }
         if ((RefC::mode == 1) && !indicated) {
-            *(out++) = specials.indicator;
+            out = ranges::copy(t({&specials.indicator, 1}), out).out;
         }
         return out;
     }

@@ -91,7 +91,8 @@ namespace cmd {
     };
     template <char_like CharT, bool reverse>
     struct translator<CharT, CharT, reverse> {
-        constexpr auto operator()(std::basic_string_view<CharT> in, const std::locale& locale = {}) const noexcept {
+        static constexpr std::size_t default_size_mul = 1;
+        constexpr auto operator()(std::basic_string_view<CharT> in, const auto&...) const noexcept {
             return in;
         }
     };
