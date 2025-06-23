@@ -90,6 +90,8 @@ namespace cmd {
     /// \tparam Result: type for identifying usages
     /// \tparam CharT: input character type
     /// \tparam FmtCharT: output character type
+    /// \tparam CharTraits: `CharTraits` for `CharT`
+    /// \tparam FmtCharTraits: `CharTraits` for `FmtCharT`
     template <usage_id Result, char_like CharT = char, char_like FmtCharT = CharT,
         typename CharTraits = std::char_traits<CharT>, typename FmtCharTraits = std::char_traits<FmtCharT>>
     struct config {
@@ -187,7 +189,7 @@ namespace cmd {
     template <config_instance Config>
     struct parser_def {
         using tag = parser_def_tag;
-        using config_type = Config;
+        using config_type = Config::super_type;
         std::size_t usage_size, tree_size, vars_size, flag_set_size, var_num;
         const Config& config;
     };
@@ -196,10 +198,10 @@ namespace cmd {
     /// (Computed) information of parser.
     /// \tparam Def: parser definition
     /// \tparam Hash: hasher
-    template <tagged<parser_def_tag> auto Def, hasher<typename decltype(Def)::super_type::char_type> Hash>
+    template <tagged<parser_def_tag> auto Def, hasher<typename decltype(Def)::config_type::char_type> Hash>
     struct parser_info {
         using tag = parser_info_tag;
-        using config_type = decltype(Def)::super_type;
+        using config_type = decltype(Def)::config_type;
         using result_type = config_type::result_type;
         using char_type = config_type::char_type;
         using hash_type = Hash;
@@ -257,7 +259,7 @@ namespace cmd {
         using string_type = std::basic_string<char_type, char_traits_type>;
         using string_view_type = config_type::string_view_type;
         using format_char_type = config_type::format_char_type;
-        using format_char_traits_type = config_type::format_traits_type;
+        using format_char_traits_type = config_type::format_char_traits_type;
         using format_string_type = std::basic_string<format_char_type, format_char_traits_type>;
         using format_string_view_type = config_type::format_string_view_type;
         using hash_type = info_type::hash_type;
@@ -704,8 +706,8 @@ namespace cmd {
             print_man(std::ostreambuf_iterator{*output_stream}, args...);
         }
         /// \return value of variable named `name`
-        constexpr string_view_type var(var_name name) const noexcept {
-            return vars_[name.index].content;
+        constexpr auto&& var(this auto&& self, var_name name) noexcept {
+            return self.vars_[name.index].content;
         }
         /// \return whether flag named `name` is set
         /// \remark The prefix of a flag has to be included in `name`.
